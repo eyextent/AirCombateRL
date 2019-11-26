@@ -19,7 +19,7 @@ np.set_printoptions(suppress=True)
 np.random.seed(2)
 
 
-def net_frame_scen(init_scen , aircraftA, aircraftB):
+def net_frame_scen(init_scen, aircraftA, aircraftB):
     """
     根据初始想定模式为红蓝双方飞机初始化
     :param init_scen:初始想定模式：0随机，1进攻，2防御，3同向，4中立
@@ -69,11 +69,12 @@ def net_frame_scen(init_scen , aircraftA, aircraftB):
         aircraftB.ac_heading = 0
     else:
         raise Exception("init_scen error")
-    aircraftA.ac_bank_angle = 0     # 滚转角
+    aircraftA.ac_bank_angle = 0  # 滚转角
     aircraftB.ac_bank_angle = 0
-    aircraftA.oil = args.Sum_Oil     # 油量
+    aircraftA.oil = args.Sum_Oil  # 油量
     aircraftB.oil = args.Sum_Oil
     return aircraftA, aircraftB
+
 
 # 构建状态空间的函数
 
@@ -189,7 +190,7 @@ class AirCombatEnv(Env):
         self.action_space = ['l', 's', 'r']  # 向左滚转、维持滚转、向右滚转
         self.n_actions = len(self.action_space)
         self.action_dim = self.n_actions
-        self.state_dim = len(self._get_state(self.red,self.blue,self.adv_count))
+        self.state_dim = len(self._get_state(self.red, self.blue, self.adv_count))
         # reward条件
         self.success = 0
 
@@ -206,15 +207,15 @@ class AirCombatEnv(Env):
         self.adv_count = 0
         # 初始化红蓝方飞机
         REGISTRY["scen"](self.init_scen, self.red, self.blue)
-        #计算ATA，AA
+        # 计算ATA，AA
         self.ATA_b, self.AA_b = self._getAngle(self.red.ac_pos, self.blue.ac_pos, self.red.ac_heading,
                                                self.blue.ac_heading)
         self.ATA_r, self.AA_r = self._getAngle(self.blue.ac_pos, self.red.ac_pos, self.blue.ac_heading,
                                                self.red.ac_heading)
         # 计算距离
-        dis = self._get_dis(self.red.ac_pos,self.blue.ac_pos)
+        dis = self._get_dis(self.red.ac_pos, self.blue.ac_pos)
         # 计算优势
-        self.adv_count = self._calculate_Advantages(self.adv_count, dis, self.AA_r,self.ATA_r,self.AA_b,self.ATA_b)
+        self.adv_count = self._calculate_Advantages(self.adv_count, dis, self.AA_r, self.ATA_r, self.AA_b, self.ATA_b)
         # reward shaping
         RA_b = 1 - ((1 - math.fabs(self.ATA_b) / 180) + (1 - math.fabs(self.AA_b) / 180))
         RA_r = 1 - ((1 - math.fabs(self.ATA_r) / 180) + (1 - math.fabs(self.AA_r) / 180))
@@ -224,8 +225,8 @@ class AirCombatEnv(Env):
         self.fai_b = -0.01 * Rbl_b
         self.fai_r = -0.01 * Rbl_r
         # 返回红蓝飞机状态
-        s_b = self._get_state(self.red,self.blue,self.adv_count)
-        s_r = self._get_state(self.blue,self.red,self.adv_count)
+        s_b = self._get_state(self.red, self.blue, self.adv_count)
+        s_r = self._get_state(self.blue, self.red, self.adv_count)
         return s_b, s_r
 
     # levin - [done]： add both actions
@@ -241,7 +242,8 @@ class AirCombatEnv(Env):
         s_r = self._get_state(self.blue, self.red, self.adv_count)
         # 计算reward
         self.reward_b, self.reward_r, self.done = self._get_reward(self.red.ac_pos, self.red.ac_heading,
-                                                    self.blue.ac_pos, self.blue.ac_heading, self.adv_count)
+                                                                   self.blue.ac_pos, self.blue.ac_heading,
+                                                                   self.adv_count)
         return s_b, s_r, self.reward_b, self.reward_r, self.done
 
     def _getAngle(self, pos_r, pos_b, heading_r, heading_b):
@@ -278,7 +280,7 @@ class AirCombatEnv(Env):
         self.ATA_b, self.AA_b = self._getAngle(ac_pos_r, ac_pos_b, ac_heading_r, ac_heading_b)
         self.ATA_r, self.AA_r = self._getAngle(ac_pos_b, ac_pos_r, ac_heading_b, ac_heading_r)
         # 计算优势
-        adv_count = self._calculate_Advantages(adv_count, dis, self.AA_r,self.ATA_r,self.AA_b,self.ATA_b)
+        adv_count = self._calculate_Advantages(adv_count, dis, self.AA_r, self.ATA_r, self.AA_b, self.ATA_b)
         # reward shaping
         RA_b = 1 - ((1 - math.fabs(self.ATA_b) / 180) + (1 - math.fabs(self.AA_b) / 180))
         RA_r = 1 - ((1 - math.fabs(self.ATA_r) / 180) + (1 - math.fabs(self.AA_r) / 180))
@@ -350,7 +352,7 @@ class AirCombatEnv(Env):
         else:
             adv_count = 0
         self.advs.append(adv_count)
-        return  adv_count
+        return adv_count
 
     def _get_dis(self, pos_a, pos_b):
         """
@@ -361,7 +363,7 @@ class AirCombatEnv(Env):
         """
         dis = math.sqrt((pos_a[0] - pos_b[0]) * (pos_a[0] - pos_b[0])
                         + (pos_a[1] - pos_b[1]) * (pos_a[1] - pos_b[1]))
-        return  dis
+        return dis
 
     def _get_state(self, aircraft_a, aircraft_b, adv_count):
         """
@@ -374,7 +376,7 @@ class AirCombatEnv(Env):
         state = np.concatenate(((aircraft_b.ac_pos - aircraft_a.ac_pos) / args.map_area,
                                 [aircraft_b.ac_heading / 180, aircraft_a.ac_heading / 180,
                                  aircraft_b.ac_bank_angle / 80, adv_count / 10]))
-        return  state
+        return state
 
     def creat_ALG(self):
         self.Tk = tk.Tk()
@@ -495,8 +497,8 @@ class AirCombatEnvOverload(Env):
         self.Dis_max = 500  # 距离最大值
         self.Dis_min = 100  # 距离最小值
         # 强化学习动作接口
-        self.action_space = ['0', '1', '2', '3', '4', '5', '6']  # 向左滚转、维持滚转、向右滚转
-        self.n_actions = len(self.action_space) 
+        self.action_space = ['0', '1', '2', '3', '4', '5', '6']
+        self.n_actions = len(self.action_space)
         self.action_dim = self.n_actions
         self.state_dim = len(self._get_state(self.red, self.blue, self.adv_count))
         # reward条件
@@ -509,13 +511,14 @@ class AirCombatEnvOverload(Env):
         self.success = 0
         self.acts = []
         # 初始化飞机位置和航母位置
+        self.red.ac_pos = np.append(np.random.uniform(-args.map_area * 0.8, args.map_area * 0.8),
+                                    np.random.uniform(-args.map_area * 0.8, args.map_area * 0.8))
 
+        self.ship_pos = np.array([0.0, 0.0, 0.0])
         # 计算距离
-        dis = self._get_dis(self.red.ac_pos,self.blue.ac_pos)
+        dis = self._get_dis(self.red.ac_pos, self.blue.ac_pos)
 
         # 返回红蓝飞机状态
-        s_b = self._get_state(self.red,self.blue,self.adv_count)
-        s_r = self._get_state(self.blue,self.red,self.adv_count)
+        s_b = self._get_state(self.red, self.blue, self.adv_count)
+        s_r = self._get_state(self.blue, self.red, self.adv_count)
         return s_b, s_r
-
-    def _init_pos(self):

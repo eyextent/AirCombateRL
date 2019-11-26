@@ -50,6 +50,9 @@ parser.add_argument("--roll_rate", type=int, default='40',help="滚转角变化�
 parser.add_argument("--random_init_pos_b", type=int, default='1',help="[0 or 1]")
 parser.add_argument("--random_init_pos_r", type=int, default='1',help="[0 or 1]")
 
+# unit
+parser.add_argument("--Sum_Oil", type=int, default='1000',help="油量，即每个episode的最大step数量")
+
 # utlis
 parser.add_argument("--seed", type=int, default="125")
 
