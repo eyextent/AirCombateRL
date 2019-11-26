@@ -55,8 +55,8 @@ def run():
         run_AirCombat_selfPlay(env, blue_agent, red_agent, train_agent_name)
     else:
         train_agent_name = 'red'
-        red_agent  = DQN(env.state_dim, env.action_dim, is_train=flag_is_train, scope='red')
         blue_agent = DQN(env.state_dim, env.action_dim, is_train=False, scope='blue')
+        red_agent  = DQN(env.state_dim, env.action_dim, is_train=flag_is_train, scope='red')
         alloc.check_scheme(blue_agent.is_train, red_agent.is_train, train_agent_name)
         run_AirCombat_selfPlay(env, red_agent, blue_agent, train_agent_name)
 

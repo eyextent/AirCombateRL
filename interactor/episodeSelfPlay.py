@@ -19,6 +19,9 @@ for i in range(len(row0)):
     trainsheet.write(0, i, row0[i])
     showsheet.write(0,i,row0[i])
 
+
+levin_debug = 0   # levin：debug专用，使用时设置为 0 即可
+
 def run_AirCombat_selfPlay(env, train_agent, use_agent, train_agent_name):  
     '''
     Params：
@@ -50,6 +53,8 @@ def run_AirCombat_selfPlay(env, train_agent, use_agent, train_agent_name):
                 #action
                 action_train_agent = train_agent.egreedy_action(state_train_agent)
                 action_use_agent = use_agent.max_action(state_use_agent)
+                if levin_debug:
+                    action_use_agent = 2
 
                 #next_state
                 next_state_train_agent, next_state_use_agent, reward_train_agent, done = alloc.env_step(env, action_train_agent, action_use_agent, train_agent_name)
@@ -69,6 +74,8 @@ def run_AirCombat_selfPlay(env, train_agent, use_agent, train_agent_name):
             while True:
                 action_train_agent = train_agent.egreedy_action(state_train_agent)
                 action_use_agent = use_agent.max_action(state_use_agent)
+                if levin_debug:
+                    action_use_agent = 2
                 next_state_train_agent, next_state_use_agent, reward, done = alloc.env_step(env, action_train_agent, action_use_agent, train_agent_name)
 
                 e_reward += reward
@@ -95,7 +102,8 @@ def run_AirCombat_selfPlay(env, train_agent, use_agent, train_agent_name):
                     while True:
                         action_train_agent = train_agent.max_action(state_train_agent)
                         action_use_agent = use_agent.max_action(state_use_agent)
-                        # action_use_agent = 2 # levin: accident
+                        if levin_debug:
+                            action_use_agent = 2
                         state_train_agent, state_use_agent, reward, done = alloc.env_step(env, action_train_agent, action_use_agent, train_agent_name)
 
                         total_reward += reward
@@ -163,7 +171,8 @@ def run_AirCombat_selfPlay(env, train_agent, use_agent, train_agent_name):
             while True:
                 action_train_agent = train_agent.max_action(state_train_agent)
                 action_use_agent = use_agent.max_action(state_use_agent)
-
+                if levin_debug:
+                    action_use_agent = 2
                 state_train_agent, state_use_agent, reward, done = alloc.env_step(env, action_train_agent, action_use_agent, train_agent_name)
 
                 e_reward += reward
@@ -210,7 +219,6 @@ def run_AirCombat_selfPlay_change(env, train_agent, use_agent, train_agent_name)
 
         #经验池存储数据
         env.init_scen = 0
-
 
 
 def _train_by_step(n_iters ):
@@ -261,26 +269,35 @@ def _train_by_episode(n_episodes, ):
 
 
 def _test_loop(test_episode, flag_test_during_train):
+    total_reward = 0
+    total_step = 0
+    blue_suc_count = 0
+    red_suc_count = 0
+    draw_count = 0
+
     for episode in range(args.episode):
         e_reward = 0
         step = 0
-        tracesheet = showbook.add_sheet('trace' + str(episode + 1), cell_overwrite_ok=True)
-        for i in range(len(row1)):
-            tracesheet.write(0, i, row1[i])
 
         state_train_agent, state_use_agent = alloc.env_reset(env, train_agent_name)
-        env.creat_ALG()
-        tracesheet.write(step + 1, 0, step + 1)
-        # tracesheet.write(step + 1, 1, float(env.ac_pos_b[0]))
-        # tracesheet.write(step + 1, 2, float(env.ac_pos_b[1]))
-        # tracesheet.write(step + 1, 3, float(env.ac_heading_b))
-        # tracesheet.write(step + 1, 4, float(env.ac_bank_angle_b))
-        # tracesheet.write(step + 1, 5, float(env.ac_pos_r[0]))
-        # tracesheet.write(step + 1, 6, float(env.ac_pos_r[1]))
-        # tracesheet.write(step + 1, 7, float(env.ac_heading_r))
-        # tracesheet.write(step + 1, 8, float(env.ac_bank_angle_r))
-        #tracesheet.write(step + 1, 8, float(env.ATA))
-        #tracesheet.write(step + 1, 9, float(env.AA))
+
+        if not flag_test_during_train:
+            env.creat_ALG()
+
+            tracesheet = showbook.add_sheet('trace' + str(episode + 1), cell_overwrite_ok=True)
+            for i in range(len(row1)):
+                tracesheet.write(0, i, row1[i])
+            tracesheet.write(step + 1, 0, step + 1)
+            # tracesheet.write(step + 1, 1, float(env.ac_pos_b[0]))
+            # tracesheet.write(step + 1, 2, float(env.ac_pos_b[1]))
+            # tracesheet.write(step + 1, 3, float(env.ac_heading_b))
+            # tracesheet.write(step + 1, 4, float(env.ac_bank_angle_b))
+            # tracesheet.write(step + 1, 5, float(env.ac_pos_r[0]))
+            # tracesheet.write(step + 1, 6, float(env.ac_pos_r[1]))
+            # tracesheet.write(step + 1, 7, float(env.ac_heading_r))
+            # tracesheet.write(step + 1, 8, float(env.ac_bank_angle_r))
+            #tracesheet.write(step + 1, 8, float(env.ATA))
+            #tracesheet.write(step + 1, 9, float(env.AA))
 
         while True:
             action_train_agent = train_agent.max_action(state_train_agent)
@@ -288,8 +305,11 @@ def _test_loop(test_episode, flag_test_during_train):
 
             state_train_agent, state_use_agent, reward, done = alloc.env_step(env, action_train_agent, action_use_agent, train_agent_name)
 
+            total_reward += reward
+            total_step += 1
             e_reward += reward
             step += 1
+
             env.render()
             tracesheet.write(step + 1, 0, step + 1)
             # tracesheet.write(step + 1, 1, float(env.ac_pos_b[0]))

@@ -216,4 +216,4 @@ class AircraftOverload(Aircraft):
 REGISTRY = {}
 REGISTRY["default"] = AircraftDefault
 REGISTRY["overload"] = AircraftOverload
-#REGISTRY["name_new"] = NewClass
+# REGISTRY["name_new"] = NewClass

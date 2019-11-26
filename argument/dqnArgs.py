@@ -76,4 +76,4 @@ def args_wrapper(args):
 args = args_wrapper(args_origin)
 
 # todo: 打印时每行一个arg
-print(args)
+pprint.pprint(args)
