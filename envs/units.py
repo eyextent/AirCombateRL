@@ -76,6 +76,8 @@ class AircraftDefault(Aircraft):
 
     def get_oil(self):
         return self.oil
+
+        
 class AircraftOverload(Aircraft):
     def __init__(self, ac_speed=150):
         self.ac_pos = np.array([0.0, 0.0, 4000.0])  # 三维坐标

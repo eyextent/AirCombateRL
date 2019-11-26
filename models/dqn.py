@@ -68,26 +68,29 @@ class DQN2013(DQN):
         self.learning_rate = args.learning_rate
 
         self.save_path = args.save_path
-        self.save_name = args.file_name
+        # todo： 保存路径里面添加 checkpoint_floder_name
+        self.checkpoint_folder_name = args.checkpoint_folder_name
+        self.file_name = args.file_name
 
         self.model = registry_net_frame[args.net_frame](self.state_dim, self.n_action)
         if U.is_cuda():
             self.model = self.model.cuda()
         
         self.optimizer = optim.Adam(self.model.parameters(), lr=self.learning_rate)
-        self.load_parms()
+        self._load_parms()
         
         
-    def load_parms(self):
+    def _load_parms(self):
+        # todo: if self.scope:  pkl_file_path = xxxx    else:  pkl_save_path =  xxx   [in __init__()]
         if self.is_train:
             if self.is_based:
                 self.epsilon = INITIAL_EPSILON * 0.5
-                self.model.load_state_dict(torch.load(self.save_path + self.scope + self.save_name))
+                self.model.load_state_dict(torch.load(self.save_path + self.scope + self.file_name))
                 #     print("Successfully loaded:", checkpoint.model_checkpoint_path)
                 # else:
                 #     print("Could not find old network weights")
         else:
-            file_path = self.save_path + self.scope + self.save_name
+            file_path = self.save_path + self.scope + self.file_name
             if os.path.exists(file_path):
                 self.model.load_state_dict(torch.load(file_path))
                 print("\n\n\n=======Successfully loaded:" + file_path + "========")
@@ -130,10 +133,9 @@ class DQN2013(DQN):
             self.train()
 
     def store_data(self, state, action, reward, next_state, done):
-        self.replay_buffer.store(state, action, reward,
-                                   next_state, done)
         if len(self.replay_buffer) > args.replay_size:
             self.replay_buffer.pop()
+        self.replay_buffer.store(state, action, reward, next_state, done)
 
     def egreedy_action(self, state):
         if self.epsilon > 0.1:
@@ -142,7 +144,6 @@ class DQN2013(DQN):
             self.epsilon = self.epsilon * args.decay_rate
 
         if random.random() > self.epsilon:
-            # state   = Variable(torch.FloatTensor(state.astype(np.float32)).unsqueeze(0), volatile=True)
             state   = U.Variable(torch.FloatTensor(state.astype(np.float32)).unsqueeze(0))
             q_value = self.model(state)
             action_max_value, index = torch.max(q_value, 1)
@@ -153,11 +154,10 @@ class DQN2013(DQN):
             action = random.randrange(self.n_action)
         return action
 
-    def action(self, state):
+    def max_action(self, state):
         if self.bool_defaule_action:
             return 2
         else:
-            # state   = Variable(torch.FloatTensor(state.astype(np.float32)).unsqueeze(0), volatile=True)
             state   = U.Variable(torch.FloatTensor(state.astype(np.float32)).unsqueeze(0))
             q_value = self.model(state)
             action_max_value, index = torch.max(q_value, 1)
@@ -168,6 +168,6 @@ class DQN2013(DQN):
         if not os.path.exists(self.save_path):
             os.makedirs(self.save_path)
         if iter_num is None:
-            torch.save(self.model.state_dict(), self.save_path + self.scope + self.save_name)
+            torch.save(self.model.state_dict(), self.save_path + self.scope + self.file_name)
         else:
-            torch.save(self.model.state_dict(), self.save_path + str(iter_num) + self.scope + self.save_name)
+            torch.save(self.model.state_dict(), self.save_path + str(iter_num) + self.scope + self.file_name)

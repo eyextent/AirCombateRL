@@ -13,3 +13,6 @@ REGISTRY["airCombateNew"] = AirCombatEnv_new
 def make(name):
 	return REGISTRY[name]()
 
+
+
+
