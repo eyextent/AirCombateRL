@@ -10,19 +10,19 @@ import pprint
 
 parser = argparse.ArgumentParser()
 
-# main   ---  runner
-parser.add_argument("--env_name", type=str, default="airCombate", help="游戏名字")
+# runner
+parser.add_argument("--env_name", type=str, default="airCombate", help="游戏名字") 
 parser.add_argument("--flag_is_train", type=int, default="1", help="flag_IsTrain = 1, 一个训练，一个使用； flag_IsTrain = 0, 两个都是在使用")
 parser.add_argument("--flag_focus_blue", type=int, default="1", help="flag_focus_blue = 1 时训练agent_blue； flag_focus_blue = 0 时训练agent_red")
 
 
-# run_this.py  --- trainer
+# interactor
 parser.add_argument("--episode", type=int, default="2000000", help="训练的最大episode数")
 parser.add_argument("--store", type=int, default="10000", help="初始化经验池时运行的episode数")
 parser.add_argument("--test_episode", type=int, default="100", help="测试时运行的episode数")
 parser.add_argument("--train_episode", type=int, default="100", help="每训练多少个episode后启动测试")
 
-# RL_brain.py  --- models
+# models
 parser.add_argument("--net_frame", type=str, default='mlp', help="[mlp, cnn2mlp, cnn2rnn2mlp]")
 parser.add_argument("--hidden_units", default=[128, 128], help="每个隐藏层的神经元数量")
 parser.add_argument("--convs", default=[(32, 8, 4), (64, 4, 2), (64, 3, 1)], help="每个卷积层设置")
