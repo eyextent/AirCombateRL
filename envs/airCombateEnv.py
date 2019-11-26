@@ -10,7 +10,7 @@ from envs.tools import random_pos, init_pos
 sys.path.append('..')
 from argument.dqnArgs import args
 from envs.units import REGISTRY as registry_unints
-from utlis.utlis import distance
+from common.utlis import distance
 
 if sys.version_info.major == 2:
     import Tkinter as tk
@@ -513,7 +513,7 @@ class AirCombatEnvOverload(Env):
 if __name__ == '__main__':
     env = AirCombatEnvOverload()
     s = env.reset()
-    A = [0]
+    A = [2]
     for a in A:
         s_b, reward_r, done = env.step(a)
         print(s_b, reward_r, done)
