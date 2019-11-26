@@ -5,7 +5,7 @@ import numpy as np
 import math
 import time
 import sys
-
+from envs.tools import random_pos, init_pos
 sys.path.append('..')
 from argument.dqnArgs import args
 from envs.units import REGISTRY as registry_unints
@@ -16,71 +16,6 @@ else:
     import tkinter as tk
 
 np.set_printoptions(suppress=True)
-np.random.seed(2)
-
-
-def net_frame_scen(init_scen, aircraftA, aircraftB):
-    """
-    根据初始想定模式为红蓝双方飞机初始化
-    :param init_scen:初始想定模式：0随机，1进攻，2防御，3同向，4中立
-    :param aircraftA:飞机A：被固定的一方
-    :param aircraftB:飞机B：随机生成的一方
-    """
-    if init_scen == 0:  # 随机
-        # 初始化A飞机
-        aircraftA.ac_pos = np.append(np.random.uniform(-500, 500),
-                                     np.random.uniform(-250, 250))
-        aircraftA.ac_heading = np.random.uniform(0, 360)
-        # 初始化B飞机
-        aircraftB.ac_pos = np.append(np.random.uniform(-500, 500),
-                                     np.random.uniform(-250, 250))
-        aircraftB.ac_heading = np.random.uniform(0, 360)
-    elif init_scen is 1:
-        # 初始化A飞机
-        aircraftA.ac_pos = np.array([0.0, 0.0])  # 二维坐标
-        aircraftA.ac_heading = 0  # 朝向角,向东
-        # 初始化B飞机
-        aircraftB.ac_pos = np.append(np.random.uniform(-100, -500),
-                                     np.random.uniform(-50, 50))
-        aircraftB.ac_heading = np.random.uniform(0, 60)
-    elif init_scen == 2:
-        # 初始化A飞机
-        aircraftA.ac_pos = np.array([0.0, 0.0])  # 二维坐标
-        aircraftA.ac_heading = 0  # 朝向角,向东
-        # 初始化B飞机
-        aircraftB.ac_pos = np.append(np.random.uniform(100, 500),
-                                     np.random.uniform(-50, 50))
-        aircraftB.ac_heading = np.random.uniform(0, 30)
-    elif init_scen == 3:
-        # 初始化A飞机
-        aircraftA.ac_pos = np.array([0.0, 0.0])  # 二维坐标
-        aircraftA.ac_heading = 0  # 朝向角,向东
-        # 初始化B飞机
-        aircraftB.ac_pos = np.append(np.random.uniform(100, 500),
-                                     np.random.uniform(-50, 50))
-        aircraftB.ac_heading = np.random.uniform(150, 180)
-    elif init_scen == 4:
-        # 初始化A飞机
-        aircraftA.ac_pos = np.array([0.0, 0.0])  # 二维坐标
-        aircraftA.ac_heading = 0  # 朝向角,向东
-        # 初始化B飞机
-        aircraftB.ac_pos = np.append(np.random.uniform(-50, 50),
-                                     np.random.uniform(-250, 250))
-        aircraftB.ac_heading = 0
-    else:
-        raise Exception("init_scen error")
-    aircraftA.ac_bank_angle = 0  # 滚转角
-    aircraftB.ac_bank_angle = 0
-    aircraftA.oil = args.Sum_Oil  # 油量
-    aircraftB.oil = args.Sum_Oil
-    return aircraftA, aircraftB
-
-
-# 构建状态空间的函数
-
-REGISTRY = {}
-REGISTRY["scen"] = net_frame_scen
-
 
 class Env(object):
     def __init__(self):
@@ -185,7 +120,7 @@ class AirCombatEnv(Env):
         self.Dis_min = 100  # 距离最小值
         self.adv_count = 0  # 持续建立优势的次数
         # 初始想定模式：0随机，1进攻，2防御，3同向，4中立
-        self.init_scen = 0
+        self.init_scen = args.init_scen
         # 强化学习动作接口
         self.action_space = ['l', 's', 'r']  # 向左滚转、维持滚转、向右滚转
         self.n_actions = len(self.action_space)
@@ -206,7 +141,7 @@ class AirCombatEnv(Env):
         self.ATA_r = self.AA_r = 100
         self.adv_count = 0
         # 初始化红蓝方飞机
-        REGISTRY["scen"](self.init_scen, self.red, self.blue)
+        random_pos(self.init_scen, self.red, self.blue, args.random_r, args.random_b)
         # 计算ATA，AA
         self.ATA_b, self.AA_b = self._getAngle(self.red.ac_pos, self.blue.ac_pos, self.red.ac_heading,
                                                self.blue.ac_heading)
@@ -497,8 +432,7 @@ class AirCombatEnvOverload(Env):
         self.Dis_max = 500  # 距离最大值
         self.Dis_min = 100  # 距离最小值
         # 强化学习动作接口
-        self.action_space = ['0', '1', '2', '3', '4', '5', '6']
-        self.n_actions = len(self.action_space)
+        self.n_actions = len(self.red.action_space)
         self.action_dim = self.n_actions
         self.state_dim = len(self._get_state(self.red, self.blue, self.adv_count))
         # reward条件
@@ -511,10 +445,7 @@ class AirCombatEnvOverload(Env):
         self.success = 0
         self.acts = []
         # 初始化飞机位置和航母位置
-        self.red.ac_pos = np.append(np.random.uniform(-args.map_area * 0.8, args.map_area * 0.8),
-                                    np.random.uniform(-args.map_area * 0.8, args.map_area * 0.8))
-
-        self.ship_pos = np.array([0.0, 0.0, 0.0])
+        self.red, self.pos = init_pos(self.red,self.pos,args.envs_type)
         # 计算距离
         dis = self._get_dis(self.red.ac_pos, self.blue.ac_pos)
 

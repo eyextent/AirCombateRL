@@ -78,6 +78,7 @@ class AircraftDefault(Aircraft):
         return self.oil
 class AircraftOverload(Aircraft):
     def __init__(self, ac_speed=150):
+        self.action_space = ['0', '1', '2', '3', '4', '5', '6']
         self.ac_pos = np.array([0.0, 0.0, 4000.0])  # 三维坐标
         self.ac_speed = ac_speed  # 飞机速度，m/s
         self.ac_speed_min = 100
