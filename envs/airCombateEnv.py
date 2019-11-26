@@ -6,9 +6,11 @@ import math
 import time
 import sys
 from envs.tools import random_pos, init_pos
+
 sys.path.append('..')
 from argument.dqnArgs import args
 from envs.units import REGISTRY as registry_unints
+from utlis.utlis import distance
 
 if sys.version_info.major == 2:
     import Tkinter as tk
@@ -16,6 +18,7 @@ else:
     import tkinter as tk
 
 np.set_printoptions(suppress=True)
+
 
 class Env(object):
     def __init__(self):
@@ -142,6 +145,8 @@ class AirCombatEnv(Env):
         self.adv_count = 0
         # 初始化红蓝方飞机
         random_pos(self.init_scen, self.red, self.blue, args.random_r, args.random_b)
+        # print(self.red.ac_pos)
+        # print(self.blue.ac_pos)
         # 计算ATA，AA
         self.ATA_b, self.AA_b = self._getAngle(self.red.ac_pos, self.blue.ac_pos, self.red.ac_heading,
                                                self.blue.ac_heading)
@@ -171,13 +176,17 @@ class AirCombatEnv(Env):
         # 执行动作
         self.blue.move(action_b)
         self.red.move(action_r)
+        # print(self.red.ac_pos)
+        # print(self.blue.ac_pos)
         # 返回红蓝飞机状态
         s_b = self._get_state(self.red, self.blue, self.adv_count)
         s_r = self._get_state(self.blue, self.red, self.adv_count)
         # 计算reward
-        self.reward_b, self.reward_r, self.done = self._get_reward(self.red.ac_pos, self.red.ac_heading,
-                                                                   self.blue.ac_pos, self.blue.ac_heading,
-                                                                   self.adv_count)
+        self.reward_b, self.reward_r, self.done, self.adv_count = self._get_reward(self.red.ac_pos, self.red.ac_heading,
+                                                                                   self.blue.ac_pos,
+                                                                                   self.blue.ac_heading,
+                                                                                   self.adv_count)
+        # print(s_b, s_r, self.reward_b, self.reward_r, self.done)
         return s_b, s_r, self.reward_b, self.reward_r, self.done
 
     def _getAngle(self, pos_r, pos_b, heading_r, heading_b):
@@ -226,16 +235,19 @@ class AirCombatEnv(Env):
         self.fai_b = -0.01 * Rbl_b
         self.fai_r = -0.01 * Rbl_r
         # 计算reward和终止条件
+        # print(adv_count)
         if adv_count >= 9:
             done = True
             self.success = 1
             reward_b = 2.0
             reward_r = -2.0
+            # print("bsuccess")
         elif adv_count <= -9:
             done = True
             self.success = -1
             reward_b = -2.0
             reward_r = 2.0
+            # print("rsuccess")
         elif self.red.oil <= 0 and self.blue.oil <= 0:
             done = True
             self.success = 0
@@ -257,7 +269,7 @@ class AirCombatEnv(Env):
             done = False
             reward_b = (self.fai_b - self.old_fai_b) - 0.001
             reward_r = (self.fai_r - self.old_fai_r) - 0.001
-        return reward_b, reward_r, done
+        return reward_b, reward_r, done, adv_count
 
     def _calculate_Advantages(self, adv_count, dis, AA_r, ATA_r, AA_b, ATA_b):
         """
@@ -423,32 +435,85 @@ class AirCombatEnvMultiUnit(Env):
 
 
 class AirCombatEnvOverload(Env):
+
     def __init__(self):
-        super(AirCombatEnv, self).__init__()
+        super(AirCombatEnvOverload, self).__init__()
         # 飞机参数
         self.red = registry_unints["overload"]()  # 红方飞机
+        self.ap_pos = np.array([0, 0, 0])
+        self.ap_heading = 0
+
+        self.last_action = 1
         # reward判断指标
-        self.Dis_max = 500  # 距离最大值
-        self.Dis_min = 100  # 距离最小值
+        self.dis_error = 200  # 距离最大值
+        self.angle_error = 1
+        self.altitude_error = 110
         # 强化学习动作接口
         self.n_actions = len(self.red.action_space)
         self.action_dim = self.n_actions
-        self.state_dim = len(self._get_state(self.red, self.blue, self.adv_count))
+        self.state_dim = len(self._get_state(self.red, self.ap_pos, self.ap_heading, self.last_action))
         # reward条件
         self.success = 0
 
-    def reset_selfPlay(self):
+    def reset(self):
         # 初始化参数
-        self.reward = 0
-        self.done = False
         self.success = 0
         self.acts = []
+        self.last_action = 1
         # 初始化飞机位置和航母位置
-        self.red, self.pos = init_pos(self.red,self.pos,args.envs_type)
-        # 计算距离
-        dis = self._get_dis(self.red.ac_pos, self.blue.ac_pos)
-
+        self.red, self.ap_pos = init_pos(self.red, self.ap_pos, args.envs_type)
+        self.ap_heading = 0
         # 返回红蓝飞机状态
-        s_b = self._get_state(self.red, self.blue, self.adv_count)
-        s_r = self._get_state(self.blue, self.red, self.adv_count)
-        return s_b, s_r
+        s = self._get_state(self.red, self.ap_pos, self.ap_heading, self.last_action)
+        return s
+
+    def _get_reward(self, red, ap_pos, ap_heading):
+        """
+
+        :param red:
+        :param ap_pos:
+        :param ap_heading:
+        :return:
+        """
+        dis = distance(red.ac_pos, ap_pos)
+        if (abs(red.ac_heading - ap_heading) <= self.angle_error) and (dis <= self.dis_error) \
+                and (abs(red.ac_pos[2] - ap_pos[2]) <= self.altitude_error):
+            done = True
+            self.success = 1
+            reward = 20
+        elif (red.oil <= 0):
+            done = True
+            reward = -10
+        elif (red.ac_pos[0] > args.map_area or 0 - red.ac_pos[0] > args.map_area or
+              red.ac_pos[1] > args.map_area or 0 - red.ac_pos[1] > args.map_area) or \
+                (red.ac_pos[2] > 8000) or (red.ac_pos[2] < 0):
+            done = True
+            reward = -20
+        else:
+            reward = 0
+            done = False
+        return reward, done
+
+    def step(self, action):
+        self.red.move(action)
+        s = self._get_state(self.red, self.ap_pos, self.ap_heading, self.last_action)
+
+        reward, done = self._get_reward(self.red, self.ap_pos, self.ap_heading)
+        return s, reward, done
+
+    def _get_state(self, aircraft, ap_pos, ap_heading, last_action):
+        state = np.concatenate(((aircraft.ac_pos - ap_pos) / args.map_area,
+                                [(aircraft.ac_heading - ap_heading) / 360,
+                                aircraft.oil / args.Sum_Oil,
+                                last_action / (self.n_actions - 1)]))
+        return state
+
+
+# 环境测试程序
+if __name__ == '__main__':
+    env = AirCombatEnvOverload()
+    s = env.reset()
+    A = [0]
+    for a in A:
+        s_b, reward_r, done = env.step(a)
+        print(s_b, reward_r, done)

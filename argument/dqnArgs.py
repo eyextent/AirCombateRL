@@ -39,17 +39,17 @@ parser.add_argument("--unit_type", type=str, default='default',help="[default,]"
 parser.add_argument("--red_unit_type_list", default=['default'], help="飞机类型包括：[default,]")  # MvN环境中使用
 parser.add_argument("--blue_unit_type_list", default=['default'], help="飞机类型包括：[default,]") # MvN环境中使用
 
-parser.add_argument("--envs_type", type=str, default='2D_xy',help="场景类型：2D_xy, 2D_xz, ")
+parser.add_argument("--envs_type", type=str, default='2D_xy',help="场景类型：2D_xy, 2D_xz, 3D")
 
-parser.add_argument("--map_area", type=int, default='2500',help="设定地图范围")
+parser.add_argument("--map_area", type=int, default='3000',help="设定地图范围")
 parser.add_argument("--map_scale", type=float, default='0.1',help="地图比例尺")
 parser.add_argument("--map_t", type=float, default='0.5',help="时间间隔（步长，秒)")
 parser.add_argument("--map_t_n", type=int, default='5',help="每个步长计算次数")
 parser.add_argument("--env_random_seed", type=int, default='2',help="环境随机种子")
 
 parser.add_argument("--init_scen", type=int, default='0',help="初始想定模式包括：0随机，1进攻，2防御，3同向，4中立")
-parser.add_argument("--random_r", type=bool, default='False',help="红方是否在初始化过程中随机")
-parser.add_argument("--random_b", type=bool, default='True',help="蓝方是否在初始化过程中随机")
+parser.add_argument("--random_r", type=int, default='0',help="红方是否在初始化过程中随机")
+parser.add_argument("--random_b", type=int, default='1',help="蓝方是否在初始化过程中随机")
 
 parser.add_argument("--G", type=float, default='9.81',help="重力加速度")
 parser.add_argument("--roll_rate", type=int, default='40',help="滚转角变化率")

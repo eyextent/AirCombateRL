@@ -91,7 +91,8 @@ class AircraftOverload(Aircraft):
         self.ac_roll = 0  # 滚转角
         self.rate_roll = 40  # 滚转角变化率
         self.roll_max = 80
-        self.t = 0.5
+        self.oil = args.Sum_Oil
+        self.t = args.map_t / args.map_t_n
         self.nx = 0  # 切向过载
         self.ny = 1  # 过载
         self.nz = 0  # 过载
@@ -113,9 +114,9 @@ class AircraftOverload(Aircraft):
         #####
 
         self.list.append(action)
-        for i in range(1, 9):
+        for i in range(args.map_t_n):
             self._overload(action)
-            a, rate_pitch, rate_heading = self._get_rate(self.nx, self.ny, self.nz, self.ac_pitch, G, self.ac_speed)
+            a, rate_pitch, rate_heading = self._get_rate(self.nx, self.ny, self.nz, self.ac_pitch, args.G, self.ac_speed)
             self.ac_speed = self.ac_speed + a * self.t
             ##### 检查速度
             self.ac_speed = max(self.ac_speed,self.ac_speed_min)
