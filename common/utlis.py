@@ -25,6 +25,18 @@ def is_cuda():
 Variable = lambda *args, **kwargs: autograd.Variable(*args, **kwargs).cuda() if is_cuda() else autograd.Variable(*args, **kwargs)
 
 
+
+
+# ===========================================
+#                 algorithm
+# =========================================== 
+def epsilon_scheduler(eps_start, eps_final, eps_decay):
+    def function(frame_idx):
+        return eps_final + (eps_start - eps_final) * math.exp(-1. * frame_idx / eps_decay)
+    return function
+
+
+
 # ===========================================
 #                   math
 # ===========================================

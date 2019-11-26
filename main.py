@@ -1,5 +1,5 @@
 from runner.selfPlayNANU import output
-from utlis.utlis import set_seed
+from common.utlis import set_seed
 
 
 if __name__ == "__main__":

@@ -13,9 +13,9 @@ import sys
 sys.path.append("..")
 from memoryBuffer.replayBuffer import ReplayBuffer
 from models.components import REGISTRY as registry_net_frame
-import utlis.utlis as U
+import common.utlis as U
 from argument.dqnArgs import args
-from utlis.utlis import set_seed
+from common.utlis import set_seed
 
 # todo: 判断需要更全面，添加报错机制
 net_frmae = registry_net_frame[args.net_frame]
