@@ -164,7 +164,6 @@ class AirCombatEnv(Env):
         s_r = self._get_state(self.blue, self.red, self.adv_count)
         return s_b, s_r
 
-    # levin - [done]： add both actions
     def step_selfPlay(self, action_b, action_r):
         # 记录动作
         self.acts[0].append(action_b)

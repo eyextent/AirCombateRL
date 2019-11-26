@@ -76,6 +76,8 @@ class AircraftDefault(Aircraft):
 
     def get_oil(self):
         return self.oil
+
+        
 class AircraftOverload(Aircraft):
     def __init__(self, ac_speed=150):
         self.action_space = ['0', '1', '2', '3', '4', '5', '6']
@@ -215,4 +217,4 @@ class AircraftOverload(Aircraft):
 REGISTRY = {}
 REGISTRY["default"] = AircraftDefault
 REGISTRY["overload"] = AircraftOverload
-#REGISTRY["name_new"] = NewClass
+# REGISTRY["name_new"] = NewClass

@@ -11,3 +11,6 @@ REGISTRY["airCombateNvsM"] = AirCombatEnvMultiUnit
 def make(name):
 	return REGISTRY[name]()
 
+
+
+
