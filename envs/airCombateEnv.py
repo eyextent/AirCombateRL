@@ -6,10 +6,11 @@ import math
 import time
 import sys
 from envs.tools import random_pos, init_pos
+from envs.tools import REGISTRY_STATE as registry_state
 
 sys.path.append('..')
 from argument.dqnArgs import args
-from envs.units import REGISTRY as registry_unints
+from envs.units import REGISTRY as registry_unit
 from common.utlis import distance
 
 if sys.version_info.major == 2:
@@ -114,8 +115,8 @@ class AirCombatEnv(Env):
     def __init__(self):
         super(AirCombatEnv, self).__init__()
         # 飞机参数
-        self.red = registry_unints["default"](None, 200, 80)  # 红方飞机
-        self.blue = registry_unints["default"](None, 200, 80)  # 蓝方飞机
+        self.red = registry_unit["default"](None, 200, 80)  # 红方飞机
+        self.blue = registry_unit["default"](None, 200, 80)  # 蓝方飞机
         # reward判断指标
         self.AA_range = 60  # 视界角范围
         self.ATA_range = 30  # 天线拂擦角范围
@@ -128,7 +129,7 @@ class AirCombatEnv(Env):
         self.action_space = ['l', 's', 'r']  # 向左滚转、维持滚转、向右滚转
         self.n_actions = len(self.action_space)
         self.action_dim = self.n_actions
-        self.state_dim = len(self._get_state(self.red, self.blue, self.adv_count))
+        self.state_dim = len(registry_state[args.state_setting](self.red, self.blue, self.adv_count))
         # reward条件
         self.success = 0
 
@@ -165,8 +166,8 @@ class AirCombatEnv(Env):
         self.fai_b = -0.01 * Rbl_b
         self.fai_r = -0.01 * Rbl_r
         # 返回红蓝飞机状态
-        s_b = self._get_state(self.red, self.blue, self.adv_count)
-        s_r = self._get_state(self.blue, self.red, self.adv_count)
+        s_b = registry_state[args.state_setting](self.red, self.blue, self.adv_count)
+        s_r = registry_state[args.state_setting](self.blue, self.red, self.adv_count)
         return s_b, s_r
 
     def step_selfPlay(self, action_b, action_r):
@@ -179,8 +180,8 @@ class AirCombatEnv(Env):
         # print(self.red.ac_pos)
         # print(self.blue.ac_pos)
         # 返回红蓝飞机状态
-        s_b = self._get_state(self.red, self.blue, self.adv_count)
-        s_r = self._get_state(self.blue, self.red, self.adv_count)
+        s_b = registry_state[args.state_setting](self.red, self.blue, self.adv_count)
+        s_r = registry_state[args.state_setting](self.blue, self.red, self.adv_count)
         # 计算reward
         self.reward_b, self.reward_r, self.done, self.adv_count = self._get_reward(self.red.ac_pos, self.red.ac_heading,
                                                                                    self.blue.ac_pos,
@@ -324,6 +325,12 @@ class AirCombatEnv(Env):
                                  aircraft_b.ac_bank_angle / 80, adv_count / 10]))
         return state
 
+    def _get_state_direct_pos(self, aircraft_a, aircraft_b, adv_count):
+
+        state = np.concatenate((aircraft_b.ac_pos/args.map_area, aircraft_a.ac_pos/args.map_area,
+                               aircraft_b.ac_heading / 180, aircraft_a.ac_heading / 180,
+                                 aircraft_b.ac_bank_angle / 80, adv_count / 10))
+
     def creat_ALG(self):
         self.Tk = tk.Tk()
         self.Tk.title('1V1')
@@ -367,13 +374,13 @@ class AirCombatEnvMultiUnit(Env):
         # 初始化双方飞机
         id_number = 0
         for name in args.red_unit_type_list:  # args.red_unit_type_list为飞机类型名字列表
-            red_unit = registry_unints[name](id_number)
+            red_unit = registry_unit[name](id_number)
             self.red_unit_list.append(red_unit)
             id_number = id_number + 1
 
         id_number = 0
         for name in args.blue_unit_type_list:
-            blue_unit = registry_unints[name](id_number)
+            blue_unit = registry_unit[name](id_number)
             self.blue_unit_list.append(blue_unit)
             id_number = id_number + 1
 
@@ -439,7 +446,7 @@ class AirCombatEnvOverload(Env):
     def __init__(self):
         super(AirCombatEnvOverload, self).__init__()
         # 飞机参数
-        self.red = registry_unints["overload"]()  # 红方飞机
+        self.red = registry_unit["overload"]()  # 红方飞机
         self.ap_pos = np.array([0, 0, 0])
         self.ap_heading = 0
 
