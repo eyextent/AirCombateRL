@@ -300,17 +300,6 @@ class AirCombatEnv(Env):
         self.advs.append(adv_count)
         return adv_count
 
-    def _get_dis(self, pos_a, pos_b):
-        """
-        计算坐标A和坐标B的距离
-        :param pos_a: 坐标A
-        :param pos_b: 坐标B
-        :return: 坐标A和坐标B的距离
-        """
-        dis = math.sqrt((pos_a[0] - pos_b[0]) * (pos_a[0] - pos_b[0])
-                        + (pos_a[1] - pos_b[1]) * (pos_a[1] - pos_b[1]))
-        return dis
-
     def _get_state(self, aircraft_a, aircraft_b, adv_count):
         """
         计算aircraft_b的状态
@@ -495,10 +484,13 @@ class AirCombatEnvOverload(Env):
         return reward, done
 
     def step(self, action):
-        self.red.move(action)
+        action = self._transfer_action(action)
+        for i in range(args.map_t_n):
+            self.red.move(action)
+            reward, done = self._get_reward(self.red, self.ap_pos, self.ap_heading)
+            if done is True:
+                break
         s = self._get_state(self.red, self.ap_pos, self.ap_heading, self.last_action)
-
-        reward, done = self._get_reward(self.red, self.ap_pos, self.ap_heading)
         return s, reward, done
 
     def _get_state(self, aircraft, ap_pos, ap_heading, last_action):
@@ -508,7 +500,24 @@ class AirCombatEnvOverload(Env):
                                 last_action / (self.n_actions - 1)]))
         return state
 
-
+    def _transfer_action(self, action):
+        """
+        根据环境类型转化action
+        :param action:
+        :return:
+        """
+        if args.envs_type == "2D_xy":
+            # 0 1 2 3 4 -> 0 1 2 5 6
+            if action == 3 or action == 4:
+                action = action + 2
+            return action
+        elif args.envs_type == "2D_xz":
+            # 0 1 2 3 4 -> 0 3 4 5 6
+            if action != 0:
+                action = action + 2
+            return action
+        elif args.envs_type == "3D":
+            return action
 # 环境测试程序
 if __name__ == '__main__':
     env = AirCombatEnvOverload()
