@@ -1,7 +1,7 @@
 import torch
 import sys
 
-from interactor.episodeSelfPlay import run_guidence
+from interactor.episodeTrainer import run
 
 sys.path.append('..')
 import envs
@@ -16,4 +16,4 @@ if __name__ == '__main__':
     set_seed(args.seed)
     env = envs.make(args.env_name)
     train_agent = DQN2013(env.state_dim, env.action_dim, is_train=True, is_based=False, scope="guidence")
-    run_guidence(env, train_agent)
+    run(env, train_agent)
