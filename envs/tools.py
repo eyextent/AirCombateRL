@@ -158,10 +158,6 @@ def init_pos(aircraft, ap_pos, envs_type):
 # ===========================================
 #                state setting
 # ===========================================
-REGISTRY_STATE = {}
-REGISTRY_STATE['orign_state'] = get_state
-REGISTRY_STATE['state_direct_pos'] = get_state_direct_pos
-
 
 def get_state(aircraft_a, aircraft_b, adv_count):
     """
@@ -182,3 +178,7 @@ def get_state_direct_pos(aircraft_a, aircraft_b, adv_count):
                            [aircraft_b.ac_heading / 180, aircraft_a.ac_heading / 180,
                              aircraft_b.ac_bank_angle / 80, adv_count / 10]))
     return state
+
+REGISTRY_STATE = {}
+REGISTRY_STATE['orign_state'] = get_state
+REGISTRY_STATE['state_direct_pos'] = get_state_direct_pos

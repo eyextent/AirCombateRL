@@ -13,9 +13,16 @@ from argument.dqnArgs import args
 
 class Buffer(object):
     '''
-    基类
+    基类：包含 图像样本的预处理过程，实现 pop、__len__ 函数
+    需要自己重写的函数：
+        stroe 和 sample
     '''
     def __init__(self, capacity, flag_piexl=0):
+        '''
+        子类中必须自己定义：
+            self.Transition，即每个 样本(如五元组) 的结构
+            如 self.Transition = collections.namedtuple("Transition", ["state","action","reward","next_state","done"])
+        '''
         self.replay_buffer = []
         self.capacity = capacity
         self.flag_piexl = flag_piexl
@@ -23,11 +30,13 @@ class Buffer(object):
 
     def store(self, **args):
         '''
-        根据任务自己定义：
+        参数根据任务自己定义：
             如果是常规单智能体，子类中可以使用如下参数：
                 state, action, reward, next_state, done
             如果需要存储多智能体，则酌情改变参数，
-                注意：须与__init__()函数中self.Transition的定义对应
+        注意：
+            参数须与__init__()函数中self.Transition的定义对应，
+            因为需要使用 self.Transition(**) 将五元组等样本封装起来
         '''
         raise NotImplementedError
 
@@ -39,7 +48,8 @@ class Buffer(object):
 
     def _update_size(self):
         '''
-        每次在对replay_buffer进行操作后调用此函数，以便实时更新size数值。
+        每次在对replay_buffer进行操作后调用此函数，以便实时更新size数值，方便调用 self.size;
+        self.size 等同于 len(Buffer)
         '''
         self.size = len(self.replay_buffer)
 
@@ -71,7 +81,7 @@ class Buffer(object):
 class ReplayBuffer(Buffer):
     def __init__(self, capacity, flag_piexl=0):
         super(ReplayBuffer, self).__init__(capacity, flag_piexl)
-        self.Transition = collections.namedtuple("Transition" , ["state", "action", "reward", "next_state", "done"])
+        self.Transition = collections.namedtuple("Transition", ["state","action","reward","next_state","done"])
 
     def store(self, state, action, reward, next_state, done):
         if self.size > self.capacity:
@@ -92,28 +102,31 @@ class ReplayBuffer(Buffer):
             self._piexl_re_processing(state, next_state)
 
         return state, action, reward, next_state, done
+    
 
-
-# buffer for momery replay
-class ReplayBuffer_backup(Buffer):
+class SuperviseLearningBuffer(Buffer):
     def __init__(self, capacity, flag_piexl=0):
-        super(ReplayBuffer, self).__init__(capacity, flag_piexl)
-        self.Transition = collections.namedtuple("Transition" , ["state", "action" , "reward" , "next_state" , "done"])
-    
-    def append(self, state, action, reward, next_state, done):
-        # state      = np.expand_dims(state, 0)
-        # next_state = np.expand_dims(next_state, 0)
-        
-        self.replay_buffer.append(self.Transition(state, action, reward, next_state, float(done)))
-    
-    def sample(self, batch_size):
-        batch_transition = random.sample(self.replay_buffer , batch_size)
-                #***
-        # batch_state, batch_action, batch_reward, batch_next_state, batch_done = map(np.array , zip(*batch_transition))
-        # return np.concatenate(state), action, reward, np.concatenate(next_state), done
-        return batch_transition
-    
-    def pop(self):
-        self.replay_buffer.pop(0)
+        super(SuperviseLearningBuffer, self).__init__(capacity, flag_piexl)
+        self.Transition = collections.namedtuple("Pair", ["state", "action"])
 
-    
+    def store(self, state, action):
+        # capacity 是 None 时，表示不设置最大储存空间
+        if not self.capacity is None:
+            if self.size > self.capacity:
+                self.replay_buffer.pop(0)
+                self._update_size()
+
+        if self.flag_piexl:
+            self._piexl_processing(state)
+
+        self.replay_buffer.append(self.Pair(state, action))
+        self._update_size()
+
+    def sample(self, batch_size):
+        batch_transition = random.sample(self.replay_buffer, batch_size)
+        state, action, reward, next_state, done = map(np.array , zip(*batch_transition))
+
+        if self.flag_piexl:
+            self._piexl_re_processing(state, next_state)
+
+        return state, action
