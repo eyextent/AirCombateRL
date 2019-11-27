@@ -135,19 +135,21 @@ def init_pos(aircraft, ap_pos, envs_type):
     """
     area = args.map_area * 0.8
     if envs_type == "2D_xy":
-        # aircraft.ac_pos = np.array(np.random.uniform(low = -args.map_area*0.5, high= args.map_area*0.5,size = 2))
-        # aircraft.ac_pos = np.append(aircraft.ac_pos, 0)
-        aircraft.ac_pos = np.array([-10000.0, 0.0, 0.0])
+        aircraft.ac_pos = np.array([np.random.randint(0, args.map_area*0.5),
+                                   np.random.randint(-args.map_area*0.5,args.map_area*0.5)])
+
+        aircraft.ac_pos = np.append(aircraft.ac_pos, 0)
+        # aircraft.ac_pos = np.array([-10000.0, 0.0, 0.0])
         ap_pos = np.array([0.0, 0.0, 0.0])
     elif envs_type == "3D_xz":
-        aircraft.ac_pos = np.array(np.random.uniform(-area, area),
-                                    0,
-                                    np.random.uniform(0, 5000))
+        # aircraft.ac_pos = np.array(np.random.uniform(-area, area),
+        #                             0,
+        #                             np.random.uniform(0, 5000))
         ap_pos = np.array([0.0, 0.0, 0.0])
     elif envs_type == "3D":
-        aircraft.ac_pos = np.array(np.random.uniform(-area, area),
-                                    np.random.uniform(-area, area),
-                                    5000)
+        # aircraft.ac_pos = np.array(np.random.uniform(-area, area),
+        #                             np.random.uniform(-area, area),
+        #                             5000)
         ap_pos = np.array([0.0, 0.0, 0.0])
     else:
         raise Exception("envs_type error")
