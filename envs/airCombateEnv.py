@@ -494,6 +494,7 @@ class AirCombatEnvOverload(Env):
             done = True
             self.success = 1
             reward = 20
+
         elif (self.oil <= 0):
             done = True
             reward = -10

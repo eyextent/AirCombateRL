@@ -56,7 +56,6 @@ class DQN(object):
 class DQN2013(DQN):
     def __init__(self, state_dim, n_action, is_train=False, is_based=False, scope=None):
         super(DQN2013, self).__init__(state_dim, n_action)
-        self.epsilon = args.initial_epsilon
         self.scope = scope
 
         self.is_train = is_train
@@ -137,11 +136,12 @@ class DQN2013(DQN):
             self.replay_buffer.pop()
         self.replay_buffer.store(state, action, reward, next_state, done)
 
-    def egreedy_action(self, state):
-        if self.epsilon > 0.1:
-            self.epsilon = self.epsilon - 0.000005
-        else:
-            self.epsilon = self.epsilon * args.decay_rate
+    def egreedy_action(self, state, epsilon_decay=1):
+        if epsilon_decay:
+            if self.epsilon > 0.1:
+                self.epsilon = self.epsilon - 0.000005
+            else:
+                self.epsilon = self.epsilon * args.decay_rate
 
         if random.random() > self.epsilon:
             state   = U.Variable(torch.FloatTensor(state.astype(np.float32)).unsqueeze(0))
@@ -171,3 +171,11 @@ class DQN2013(DQN):
             torch.save(self.model.state_dict(), self.save_path + self.scope + self.file_name)
         else:
             torch.save(self.model.state_dict(), self.save_path + str(iter_num) + self.scope + self.file_name)
+
+
+class DQN4NFSP(DQN):
+    def __init__(self, state_dim, action_dim):
+        super(DQN4NFSP, self).__init__(state_dim, action_dim)
+        self.memory_rl = self.replay_buffer
+        self.memory_sl = None
+

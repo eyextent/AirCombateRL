@@ -51,7 +51,8 @@ def run_AirCombat_selfPlay(env, train_agent, use_agent, train_agent_name):
                                                                          len(train_agent.replay_buffer)))
             while True:
                 #action
-                action_train_agent = train_agent.egreedy_action(state_train_agent)
+                # todo-levin: 修改 epsilon 递减机制
+                action_train_agent = train_agent.egreedy_action(state_train_agent, epsilon_decay=args.epsilon_decay)
                 action_use_agent = use_agent.max_action(state_use_agent)
                 if levin_debug:
                     action_use_agent = 2

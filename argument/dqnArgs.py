@@ -21,6 +21,7 @@ parser.add_argument("--episode", type=int, default="2000000", help="训练的最
 parser.add_argument("--store", type=int, default="10000", help="初始化经验池时运行的episode数")
 parser.add_argument("--test_episode", type=int, default="100", help="测试时运行的episode数")
 parser.add_argument("--train_episode", type=int, default="100", help="每训练多少个episode后启动测试")
+parser.add_argument("--epsilon_decay", type=int, default="1", help="epsilon_decay=1时，在样本储存阶段也递减elsilon;否则训练阶段才递减")
 
 # models
 parser.add_argument("--net_frame", type=str, default='mlp', help="[mlp, cnn2mlp, cnn2rnn2mlp]")
