@@ -91,12 +91,13 @@ class ReplayBuffer(Buffer):
         if self.flag_piexl:
             self._piexl_processing(state, next_state)
 
-        self.replay_buffer.append(self.Transition(state, action , reward , next_state , float(done)))
+        self.replay_buffer.append(self.Transition(state, action, reward, next_state, float(done)))
         self._update_size()
  
     def sample(self, batch_size):
+        assert len(self.replay_buffer) > batch_size
         batch_transition = random.sample(self.replay_buffer, batch_size)
-        state, action, reward, next_state, done = map(np.array , zip(*batch_transition))
+        state, action, reward, next_state, done = map(np.array, zip(*batch_transition))
 
         if self.flag_piexl:
             self._piexl_re_processing(state, next_state)
@@ -123,10 +124,11 @@ class SuperviseLearningBuffer(Buffer):
         self._update_size()
 
     def sample(self, batch_size):
+        assert len(self.replay_buffer) > batch_size
         batch_transition = random.sample(self.replay_buffer, batch_size)
-        state, action, reward, next_state, done = map(np.array , zip(*batch_transition))
+        state, action = map(np.array , zip(*batch_transition))
 
         if self.flag_piexl:
-            self._piexl_re_processing(state, next_state)
+            self._piexl_re_processing(state)
 
         return state, action

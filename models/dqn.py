@@ -11,7 +11,7 @@ import os
 import random
 import sys
 sys.path.append("..")
-from memoryBuffer.replayBuffer import ReplayBuffer
+from memoryBuffer.replayBuffer import ReplayBuffer, SuperviseLearningBuffer
 from models.components import REGISTRY as registry_net_frame
 import common.utlis as U
 from argument.dqnArgs import args
@@ -176,6 +176,6 @@ class DQN2013(DQN):
 class DQN4NFSP(DQN):
     def __init__(self, state_dim, action_dim):
         super(DQN4NFSP, self).__init__(state_dim, action_dim)
-        self.memory_rl = self.replay_buffer
-        self.memory_sl = None
+        self.buffer_rl = self.replay_buffer    # 简单的对rl_buffer对象进行重命名
+        self.buffer_sl = self.SuperviseLearningBuffer()
 
