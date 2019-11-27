@@ -152,3 +152,32 @@ def init_pos(aircraft, ap_pos, envs_type):
     else:
         raise Exception("envs_type error")
     return aircraft, ap_pos
+
+
+
+# ===========================================
+#                state setting
+# ===========================================
+def get_state(aircraft_a, aircraft_b, adv_count):
+    """
+    计算aircraft_b的状态
+    :param aircraft_a:
+    :param aircraft_b:
+    :param adv_count:优势次数
+    :return:aircraft_b的状态
+    """
+    state = np.concatenate(((aircraft_b.ac_pos - aircraft_a.ac_pos) / args.map_area,
+                            [aircraft_b.ac_heading / 180, aircraft_a.ac_heading / 180,
+                             aircraft_b.ac_bank_angle / 80, adv_count / 10]))
+    return state
+
+def get_state_direct_pos(aircraft_a, aircraft_b, adv_count):
+    state = np.concatenate((aircraft_b.ac_pos/args.map_area, aircraft_a.ac_pos/args.map_area,
+                           [aircraft_b.ac_heading / 180, aircraft_a.ac_heading / 180,
+                             aircraft_b.ac_bank_angle / 80, adv_count / 10]))
+    return state
+
+
+REGISTRY_STATE = {}
+REGISTRY_STATE['orign_state'] = get_state
+REGISTRY_STATE['state_direct_pos'] = get_state_direct_pos
