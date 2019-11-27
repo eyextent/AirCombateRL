@@ -453,8 +453,9 @@ class AirCombatEnvOverload(Env):
         self.last_action = 1
         # reward判断指标
         self.dis_error = 200  # 距离最大值
-        self.angle_error = 1
+        self.angle_error = 5
         self.altitude_error = 110
+        self.oil = args.Sum_Oil
         # 强化学习动作接口
         self.n_actions = len(self.red.action_space)
         self.action_dim = self.n_actions
@@ -467,11 +468,16 @@ class AirCombatEnvOverload(Env):
         self.success = 0
         self.acts = []
         self.last_action = 1
+        self.oil = args.Sum_Oil
         # 初始化飞机位置和航母位置
         self.red, self.ap_pos = init_pos(self.red, self.ap_pos, args.envs_type)
+        # print(self.red.ac_heading)
+        self.red.ac_heading = 0
         self.ap_heading = 0
+        # print(self.red.ac_pos)
         # 返回红蓝飞机状态
         s = self._get_state(self.red, self.ap_pos, self.ap_heading, self.last_action)
+        # print(s)
         return s
 
     def _get_reward(self, red, ap_pos, ap_heading):
@@ -488,7 +494,7 @@ class AirCombatEnvOverload(Env):
             done = True
             self.success = 1
             reward = 20
-        elif (red.oil <= 0):
+        elif (self.oil <= 0):
             done = True
             reward = -10
         elif (red.ac_pos[0] > args.map_area or 0 - red.ac_pos[0] > args.map_area or
@@ -502,19 +508,24 @@ class AirCombatEnvOverload(Env):
         return reward, done
 
     def step(self, action):
-        action = self._transfer_action(action)
+        convert_action = self._transfer_action(action)
+        # print(action)
         for i in range(args.map_t_n):
-            self.red.move(action)
+            self.red.move(convert_action)
             reward, done = self._get_reward(self.red, self.ap_pos, self.ap_heading)
             if done is True:
                 break
+        # print(self.red.ac_pos,self.red.ac_heading,self.red.ac_speed)
+        self.oil = self.oil - 1
         s = self._get_state(self.red, self.ap_pos, self.ap_heading, self.last_action)
+        self.last_action = action
+        # print(s, reward, done)
         return s, reward, done
 
     def _get_state(self, aircraft, ap_pos, ap_heading, last_action):
         state = np.concatenate(((aircraft.ac_pos - ap_pos) / args.map_area,
-                                [(aircraft.ac_heading - ap_heading) / 360,
-                                aircraft.oil / args.Sum_Oil,
+                                [(aircraft.ac_heading - ap_heading) / 180,
+                                self.oil / args.Sum_Oil,
                                 last_action / (self.n_actions - 1)]))
         return state
 
