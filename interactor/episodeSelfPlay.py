@@ -388,7 +388,7 @@ def run_guidence(env, train_agent):
                     step = 0
                     e_reward = 0
                     while True:
-                        action = train_agent.egreedy_action(state)
+                        action = train_agent.max_action(state)
                         state, reward, done = env.step(action)
                         total_reward += reward
                         e_reward += reward
