@@ -190,23 +190,27 @@ class AirCombatEnv(Env):
         # print(s_b, s_r, self.reward_b, self.reward_r, self.done)
         return s_b, s_r, self.reward_b, self.reward_r, self.done
 
-    def _getAngle(self, pos_r, pos_b, heading_r, heading_b):
+    def _getAngle(self, agent_A_pos, agent_B_pos, agent_A_heading, agent_B_heading):
         """
-        计算AA和ATA
-        :param pos_r: A方坐标
-        :param pos_b: B方坐标
-        :param heading_r: A方朝向
-        :param heading_b: B方朝向
-        :return:B的AA和ATA角
+        param:
+            agent_A_pos:             飞机A的坐标
+            agent_B_pos:             飞机B的坐标
+            agent_A_heading:         飞机A的朝向角
+            agent_B_heading:         飞机B的朝向角
+        return:
+            B的AA和ATA角
+        主要逻辑：
+            分别输入两架飞机的位置坐标 和 朝向角，
+            计算 第二架飞机B的 ATA 和 AA 角（见论文） 
         """
-        theta_br = 180 * math.atan2((pos_r[1] - pos_b[1]), (pos_r[0] - pos_b[0])) / math.pi
-        theta_rb = 180 * math.atan2((pos_b[1] - pos_r[1]), (pos_b[0] - pos_r[0])) / math.pi
+        theta_br = 180 * math.atan2((agent_A_pos[1] - agent_B_pos[1]), (agent_A_pos[0] - agent_B_pos[0])) / math.pi
+        theta_rb = 180 * math.atan2((agent_B_pos[1] - agent_A_pos[1]), (agent_B_pos[0] - agent_A_pos[0])) / math.pi
         if theta_br < 0:
             theta_br = 360 + theta_br
         if theta_rb < 0:
             theta_rb = 360 + theta_rb
-        ATA = heading_b - theta_br
-        AA = 180 + heading_r - theta_rb
+        ATA = agent_B_heading - theta_br
+        AA = 180 + agent_A_heading - theta_rb
         if ATA > 180:
             ATA = 360 - ATA
         elif ATA < -180:
