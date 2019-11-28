@@ -201,7 +201,7 @@ class AirCombatEnv(Env):
             B的AA和ATA角
         主要逻辑：
             分别输入两架飞机的位置坐标 和 朝向角，
-            计算 第二架飞机B的 ATA 和 AA 角（见论文） 
+            计算 第二架飞机B的 ATA 和 AA 角（见doc/pic/envs_airCombateEnv_001.png）
         """
         theta_br = 180 * math.atan2((agent_A_pos[1] - agent_B_pos[1]), (agent_A_pos[0] - agent_B_pos[0])) / math.pi
         theta_rb = 180 * math.atan2((agent_B_pos[1] - agent_A_pos[1]), (agent_B_pos[0] - agent_A_pos[0])) / math.pi
