@@ -200,6 +200,90 @@ def run_AirCombat_selfPlay(env, train_agent, use_agent, train_agent_name):
             showbook.save(args.save_path + train_agent_name + '_data_show' + '.xls')
 
 
+def _test_loop(test_episode, flag_test_during_train):
+    total_reward = 0
+    total_step = 0
+    blue_suc_count = 0
+    red_suc_count = 0
+    draw_count = 0
+
+    for episode in range(args.episode):
+        e_reward = 0
+        step = 0
+
+        state_train_agent, state_use_agent = alloc.env_reset(env, train_agent_name)
+
+        if not flag_test_during_train:
+            env.creat_ALG()
+
+            tracesheet = showbook.add_sheet('trace' + str(episode + 1), cell_overwrite_ok=True)
+            for i in range(len(row1)):
+                tracesheet.write(0, i, row1[i])
+            tracesheet.write(step + 1, 0, step + 1)
+            tracesheet.write(step + 1, 1, float(env.ac_pos_b[0]))
+            tracesheet.write(step + 1, 2, float(env.ac_pos_b[1]))
+            tracesheet.write(step + 1, 3, float(env.ac_heading_b))
+            tracesheet.write(step + 1, 4, float(env.ac_bank_angle_b))
+            tracesheet.write(step + 1, 5, float(env.ac_pos_r[0]))
+            tracesheet.write(step + 1, 6, float(env.ac_pos_r[1]))
+            tracesheet.write(step + 1, 7, float(env.ac_heading_r))
+            tracesheet.write(step + 1, 8, float(env.ac_bank_angle_r))
+            tracesheet.write(step + 1, 8, float(env.ATA))
+            tracesheet.write(step + 1, 9, float(env.AA))
+
+        while True:
+            action_train_agent = train_agent.max_action(state_train_agent)
+            action_use_agent = use_agent.max_action(state_use_agent)
+            if levin_debug:
+                action_use_agent = 2
+
+            state_train_agent, state_use_agent, reward, done = alloc.env_step(env, action_train_agent, action_use_agent, train_agent_name)
+
+            total_reward += reward
+            total_step += 1
+            e_reward += reward
+            step += 1
+
+            env.render()
+            tracesheet.write(step + 1, 0, step + 1)
+            tracesheet.write(step + 1, 1, float(env.ac_pos_b[0]))
+            tracesheet.write(step + 1, 2, float(env.ac_pos_b[1]))
+            tracesheet.write(step + 1, 3, float(env.ac_heading_b))
+            tracesheet.write(step + 1, 4, float(env.ac_bank_angle_b))
+            tracesheet.write(step + 1, 5, float(env.ac_pos_r[0]))
+            tracesheet.write(step + 1, 6, float(env.ac_pos_r[1]))
+            tracesheet.write(step + 1, 7, float(env.ac_heading_r))
+            tracesheet.write(step + 1, 8, float(env.ac_bank_angle_r))
+            tracesheet.write(step + 1, 8, float(env.ATA))
+            tracesheet.write(step + 1, 9, float(env.AA))
+
+            if done:
+                showsheet.write(episode + 1, 0, episode + 1)
+                showsheet.write(episode + 1, 1, step + 1)
+                showsheet.write(episode + 1, 2, e_reward)
+                print('Episode: ', episode, 'Step', step, "Reward:", e_reward,"Success:", env.success)
+                break
+        showbook.save(args.save_path + train_agent_name + '_data_show' + '.xls')
+
+
+def _compute_suc_num():
+    if train_agent_name == 'blue':
+        if blue_suc_count >= 0.55 * args.test_episode and red_suc_count <= 0.05 * args.test_episode:
+            suc_num += 1
+        else:
+            suc_num = 0
+    else:
+        if red_suc_count >= 0.55 * args.test_episode and blue_suc_count <= 0.05 * args.test_episode:
+            suc_num += 1
+        else:
+            suc_num = 0
+    if suc_num >= 1:
+        train_agent.save_model(episode)
+
+
+
+
+
 def run_AirCombat_selfPlay_change(env, train_agent, use_agent, train_agent_name):  
     '''
     Params：
@@ -289,16 +373,16 @@ def _test_loop(test_episode, flag_test_during_train):
             for i in range(len(row1)):
                 tracesheet.write(0, i, row1[i])
             tracesheet.write(step + 1, 0, step + 1)
-            # tracesheet.write(step + 1, 1, float(env.ac_pos_b[0]))
-            # tracesheet.write(step + 1, 2, float(env.ac_pos_b[1]))
-            # tracesheet.write(step + 1, 3, float(env.ac_heading_b))
-            # tracesheet.write(step + 1, 4, float(env.ac_bank_angle_b))
-            # tracesheet.write(step + 1, 5, float(env.ac_pos_r[0]))
-            # tracesheet.write(step + 1, 6, float(env.ac_pos_r[1]))
-            # tracesheet.write(step + 1, 7, float(env.ac_heading_r))
-            # tracesheet.write(step + 1, 8, float(env.ac_bank_angle_r))
-            #tracesheet.write(step + 1, 8, float(env.ATA))
-            #tracesheet.write(step + 1, 9, float(env.AA))
+            tracesheet.write(step + 1, 1, float(env.ac_pos_b[0]))
+            tracesheet.write(step + 1, 2, float(env.ac_pos_b[1]))
+            tracesheet.write(step + 1, 3, float(env.ac_heading_b))
+            tracesheet.write(step + 1, 4, float(env.ac_bank_angle_b))
+            tracesheet.write(step + 1, 5, float(env.ac_pos_r[0]))
+            tracesheet.write(step + 1, 6, float(env.ac_pos_r[1]))
+            tracesheet.write(step + 1, 7, float(env.ac_heading_r))
+            tracesheet.write(step + 1, 8, float(env.ac_bank_angle_r))
+            tracesheet.write(step + 1, 8, float(env.ATA))
+            tracesheet.write(step + 1, 9, float(env.AA))
 
         while True:
             action_train_agent = train_agent.max_action(state_train_agent)
@@ -313,16 +397,16 @@ def _test_loop(test_episode, flag_test_during_train):
 
             env.render()
             tracesheet.write(step + 1, 0, step + 1)
-            # tracesheet.write(step + 1, 1, float(env.ac_pos_b[0]))
-            # tracesheet.write(step + 1, 2, float(env.ac_pos_b[1]))
-            # tracesheet.write(step + 1, 3, float(env.ac_heading_b))
-            # tracesheet.write(step + 1, 4, float(env.ac_bank_angle_b))
-            # tracesheet.write(step + 1, 5, float(env.ac_pos_r[0]))
-            # tracesheet.write(step + 1, 6, float(env.ac_pos_r[1]))
-            # tracesheet.write(step + 1, 7, float(env.ac_heading_r))
-            # tracesheet.write(step + 1, 8, float(env.ac_bank_angle_r))
-            #tracesheet.write(step + 1, 8, float(env.ATA))
-            #tracesheet.write(step + 1, 9, float(env.AA))
+            tracesheet.write(step + 1, 1, float(env.ac_pos_b[0]))
+            tracesheet.write(step + 1, 2, float(env.ac_pos_b[1]))
+            tracesheet.write(step + 1, 3, float(env.ac_heading_b))
+            tracesheet.write(step + 1, 4, float(env.ac_bank_angle_b))
+            tracesheet.write(step + 1, 5, float(env.ac_pos_r[0]))
+            tracesheet.write(step + 1, 6, float(env.ac_pos_r[1]))
+            tracesheet.write(step + 1, 7, float(env.ac_heading_r))
+            tracesheet.write(step + 1, 8, float(env.ac_bank_angle_r))
+            tracesheet.write(step + 1, 8, float(env.ATA))
+            tracesheet.write(step + 1, 9, float(env.AA))
 
             if done:
                 showsheet.write(episode + 1, 0, episode + 1)

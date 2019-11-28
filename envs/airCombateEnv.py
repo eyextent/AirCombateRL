@@ -10,7 +10,7 @@ from envs.tools import REGISTRY_STATE as registry_state
 
 sys.path.append('..')
 from argument.dqnArgs import args
-from envs.units import REGISTRY as registry_unit
+from envs.unit import REGISTRY as registry_unit
 from common.utlis import distance
 
 if sys.version_info.major == 2:
