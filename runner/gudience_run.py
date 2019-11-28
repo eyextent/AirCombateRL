@@ -11,7 +11,7 @@ from argument.dqnArgs import args
 from common.utlis import set_seed
 if __name__ == '__main__':
     args.Sum_Oil = 100
-    args.map_area = 40000
+    args.map_area = 75000
     args.env_name = "guidence"
     set_seed(args.seed)
     env = envs.make(args.env_name)

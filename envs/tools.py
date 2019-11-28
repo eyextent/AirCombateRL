@@ -135,9 +135,8 @@ def init_pos(aircraft, ap_pos, envs_type):
     """
     area = args.map_area * 0.8
     if envs_type == "2D_xy":
-        aircraft.ac_pos = np.array([np.random.randint(0, args.map_area*0.5),
-                                   np.random.randint(-args.map_area*0.5,args.map_area*0.5)])
-
+        aircraft.ac_pos = np.array([np.random.randint(-args.map_area*0.8, 0),
+                                   np.random.randint(-args.map_area*0.8,args.map_area*0.8)])
         aircraft.ac_pos = np.append(aircraft.ac_pos, 0)
         # aircraft.ac_pos = np.array([-10000.0, 0.0, 0.0])
         ap_pos = np.array([0.0, 0.0, 0.0])
