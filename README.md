@@ -15,7 +15,9 @@
 结果记录与保存模块
 	logger
 其他（工具函数等）
-	utlis/
+	common/
+说明文档
+	doc/
 ```
 
 
@@ -169,6 +171,8 @@ runner/
 
     例子见子类 `ReplayBufferTransition(Buffer)`
 
+    另外，self.Transition 实现原理: [collections.namedtuple使用](#2.经验回放的collections.namedtuple使用)
+
   - `_piexl_processing` 和 `_piexl_rev_processing`
 
     仅当状态为图像时使用，用于节约内存
@@ -179,11 +183,9 @@ runner/
 
   - netFrame.py
 
-    在定义完神经网络机构之后，同样在文件最后需要进行名字的注册。
+    在定义完神经网络类之后，同样在文件最后需要进行名字的注册。
 
-    目前实现的网络结构主要包括：mlp 和 cnn-mlp
-
-    待实现：rnn-mlp（lstm-mlp），cnn-rnn-mlp
+    目前实现的网络结构主要包括：mlp
 
   - dqn.py
 
@@ -191,13 +193,17 @@ runner/
 
 - interactor/
 
-  将方法和环境的对象作为输入，完成智能体与环境交互的逻辑，包括模型训练、测试等实现。
+  将模型和环境的对象作为输入，完成智能体与环境交互的逻辑，包括模型训练、测试等实现。
 
 - runner/
 
-  可理解为main函数的实现，程序启动文件。
+  主要就是run()函数，可理解为函数的实现，程序启动文件。
 
   在博弈训练中可能针对trainer多进行一次封装，如交换训练方等。
+
+  在runner的每个py文件的最后，可以实现 `__main__` 逻辑，方便 PyCharm 调用
+
+  如果要修改参数，直接使用 args.xxx = xxx 来对参数进行修改，而不使用默认值。
 
 
 
@@ -207,16 +213,30 @@ runner/
 包含各类其他模块需要使用的工具类函数。
 
 ```
-utlis/
+common/
 	alloc.py	# 和博弈训练相关的工具函数
-	utlis.py	# 其他工具函数，包括 设置随机种子等在其他模块常用的函数
+	utlis.py	# 其他工具函数，包括 设置随机种子、数学基本计算等在其他模块常用的函数
 ```
 
 
 
 ## 结果记录与保存模块
 
+```python
+logger.py  (未实现)
+```
+
 主要是结果的保存和记录。
+
+
+
+## 文档
+
+```
+doc/
+	pic/	# 主要存放 一些解释用的图片
+	xxx		# 文档说明文件
+```
 
 
 
@@ -321,9 +341,157 @@ utlis/
   args = args_wrapper(args_origin)
   ```
 
+
+
+
+## 4. 基类(父类)说明
+
+基类主要提供两种作用：
+
+- 一种是指定接口的名称，函数内容均未实现，子类可使用同名函数覆盖
+
+  - 举例
+
+    ```python
+    class Aircraft(object):
+        def __init__(self, id_number=None):
+            '''
+            需要定义飞机的属性，飞机的编号
+            考虑：每个单位的动作空间，状态空间
+            '''
+            raise NotImplementedError
+    
+        def move(self, action):
+            '''
+            使用动力学模型：_aricraft_dynamic
+                输入：动作
+                输出：位置，朝向角等
+            '''
+            raise NotImplementedError
+    
+        def get_oil(self):
+            '''
+            剩余油量
+            '''
+            raise NotImplementedError
+    
+        def attack_range(self):
+            '''
+            攻击范围
+            '''
+            raise NotImplementedError
+    ```
+
+- 另一种除说明接口名称外，还实现共同功能，子类只需按照自己的需求重写部分函数
+
+  - 举例：
+
+    ```python
+    class Buffer(object):
+        '''
+        基类：包含 图像样本的预处理过程，实现 pop、__len__ 函数
+        需要自己重写的函数：
+            stroe 和 sample
+        '''
+        def __init__(self, capacity, flag_piexl=0):
+            '''
+            子类中必须自己定义：
+                self.Transition，即每个 样本(如五元组) 的结构
+            '''
+            self.replay_buffer = []
+            self.capacity = capacity
+            self.flag_piexl = flag_piexl
+            self.size = len(self.replay_buffer)
+    
+        def store(self, **args):
+            '''
+            参数根据任务自己定义：
+                如果是常规单智能体，子类中可以使用如下参数：
+                    state, action, reward, next_state, done
+                如果需要存储多智能体，则酌情改变参数，
+            注意：
+                参数须与__init__()函数中self.Transition的定义对应，
+                因为需要使用 self.Transition(**) 将五元组等样本封装起来
+            '''
+            raise NotImplementedError
+    
+        def sample(self, batch_size):
+            raise NotImplementedError
+    
+        def pop(self):
+            self.replay_buffer.pop(0)
+    
+        def _update_size(self):
+            self.size = len(self.replay_buffer)
+    
+        def _piexl_processing(state, next_state):
+            assert np.amin(state) >= 0.0
+            assert np.amax(state) <= 1.0
+    
+            # Class LazyFrame --> np.array()
+            state = np.array(state)
+            next_state = np.array(next_state)
+    
+            state  = (state * 255).round().astype(np.uint8)
+            next_state = (next_state * 255).round().astype(np.uint8)
+    
+        def _piexl_rev_processing(state, next_state):
+            state = state.astype(np.float32) / 255.0
+            next_state = next_state.astype(np.float32) / 255.0
+    
+        def __len__(self):
+            return len(self.replay_buffer)
+    ```
+
+
+
+# 注释规范
+
+每个函数原则上都应该增加注释，注释主要包括三部分：函数的整体逻辑、输入参数说明、输出结果说明。
+
+若参数名可辨识，则只需指明特殊类型；若参数名不可辨识，则需要对参数进行文字描述。
+
+- 参数名可辨识的注释举例
+
+  ```python
+  def run_AirCombat_selfPlay(env, train_agent_list, use_agent_list, train_agent_name):  
+      '''
+      Params：
+          env:                class object
+          train_agent_list:   class object list
+          use_agent_list:     class object list
+          train_agent_name:   str
   
+      主要逻辑：
+          将红、蓝智能体分为训练智能体、使用智能体进行训练；
+          使用 alloc 模块 进行 红&蓝 与 训练&使用 之间的转换,
+          完成训练和测试功能，并可以进行可视化。
+      '''
+      # todo
+      raise NotImplementedError
+  ```
 
+- 参数名不可辨识的注释举例
 
+  ```python
+  def _getAngle(self, agent_A_pos, agent_B_pos, agent_A_heading, agent_B_heading):
+          """
+          param:
+              agent_A_pos:             飞机A的坐标
+              agent_B_pos:             飞机B的坐标
+              agent_A_heading:         飞机A的朝向角
+              agent_B_heading:         飞机B的朝向角
+          return:
+              B的AA和ATA角
+          主要逻辑：
+              分别输入两架飞机的位置坐标 和 朝向角，
+              计算 第二架飞机B的 ATA 和 AA 角（见论文） 
+          """
+          xxxxxx
+          xxxxxx
+          
+          return ATA, AA
+  ```
 
 
 
