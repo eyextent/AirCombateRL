@@ -478,7 +478,7 @@ class AirCombatEnvOverload(Env):
         # print(self.red.ac_heading)
         self.red.ac_heading = 0
         self.ap_heading = 0
-        # print(self.red.ac_pos)
+        print(self.red.ac_pos)
         # 返回红蓝飞机状态
         s = self._get_state(self.red, self.ap_pos, self.ap_heading, self.last_action)
         # print(s)
@@ -520,7 +520,7 @@ class AirCombatEnvOverload(Env):
             reward, done = self._get_reward(self.red, self.ap_pos, self.ap_heading)
             if done is True:
                 break
-        # print(self.red.ac_pos,self.red.ac_heading,self.red.ac_speed)
+        print(self.red.ac_pos,self.red.ac_heading,self.red.ac_speed)
         self.oil = self.oil - 1
         s = self._get_state(self.red, self.ap_pos, self.ap_heading, self.last_action)
         self.last_action = action
@@ -553,12 +553,52 @@ class AirCombatEnvOverload(Env):
         elif args.envs_type == "3D":
             return action
 
+    def creat_ALG(self):
+        self.Tk = tk.Tk()
+        self.Tk.title('1V1')
+        self.Tk.canvas = tk.Canvas(self.Tk, bg='white',
+                                   height=args.map_area * args.map_scale * 2,
+                                   width=args.map_area * args.map_scale * 2)
+        self.x_show = self.xyz2abc([0,0,0])
+        self.x = self.Tk.canvas.create_oval(
+            self.x_show[0] - 1, self.x_show[1] - 1,
+            self.x_show[0] + 1, self.x_show[1] + 1,
+            fill='black')
+        self.Tk.canvas.pack()
+
+    def render(self):
+        # 刷新红方飞机
+        self.r_show = self.xyz2abc(self.red.ac_pos)
+        self.r = self.Tk.canvas.create_oval(
+            self.r_show[0] - 1, self.r_show[1] - 1,
+            self.r_show[0] + 1, self.r_show[1] + 1,
+            fill='red')
+
+        self.Tk.update()
+        time.sleep(0.05)
+        # if self.done:
+        #     time.sleep(0.1)
+        #     self.Tk.destroy()
+
+    def xyz2abc(self, pos):
+        pos_show = np.array([0, 0])
+        pos_show[0] = pos[0] * args.map_scale + args.map_area * args.map_scale
+        pos_show[1] = args.map_area * args.map_scale - pos[1] * args.map_scale
+        return pos_show
 
 # 环境测试程序
 if __name__ == '__main__':
+    args.Sum_Oil = 100
+    args.map_scale = 0.01
+    args.map_area = 75000
     env = AirCombatEnvOverload()
     s = env.reset()
-    A = [2]
+    env.creat_ALG()
+    env.render()
+    A = [1, 1, 2, 1, 2, 1, 0, 0, 0, 3, 1, 0, 0, 0, 0, 0, 1, 1, 1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 2, 4, 2, 4, 2, 4, 4, 2,
+     0, 2, 2, 4, 4, 2, 0, 3, 3, 2, 2, 2, 2, 2, 2, 3, 2, 3, 3, 2, 2, 4, 2, 2, 2, 2, 4, 4, 4, 1, 4, 4, 1, 4, 4, 4, 4, 4,
+     4, 4, 4, 4, 2, 2, 2, 0, 4, 2, 2, 2, 2, 2, 2, 2, 1, 0, 2, 2, 1, 1, 1, 1, 1]
     for a in A:
         s_b, reward_r, done = env.step(a)
         print(s_b, reward_r, done)
+        env.render()
