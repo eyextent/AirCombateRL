@@ -15,7 +15,7 @@ def run(env, train_agent):
             state = env.reset()
             if episode % 100 == 0:
                 print('data collection: {} ,buffer capacity: {} '.format(episode / 100,
-                                                                     len(train_agent.replay_buffer)))
+                                                                         len(train_agent.replay_buffer)))
             while True:
                 action = train_agent.egreedy_action(state)
                 next_state, reward, done = env.step(action)
@@ -23,7 +23,7 @@ def run(env, train_agent):
                 state = next_state
                 if done:
                     break
-            if (len(train_agent.replay_buffer) >= 100000):
+            if len(train_agent.replay_buffer) >= 100000:
                 break
         # 开始训练
         for episode in range(args.episode):
@@ -40,8 +40,8 @@ def run(env, train_agent):
                 if done:
                     print('Episode: ', episode, 'Step', step, "Reward:", e_reward, train_agent.epsilon, env.acts)
                     break
-            if (episode % args.train_episode == 0):
-                train_agent.save_model(episode)
+            if episode % args.train_episode == 0:
+                train_agent.save_model()
                 total_reward = 0
                 for i in range(args.test_episode):
                     state = env.reset()
@@ -62,19 +62,4 @@ def run(env, train_agent):
                 else:
                     suc_num = 0
                 if suc_num >= 5:
-                    break
-    else:
-        for episode in range(args.episode):
-            e_reward = 0
-            step = 0
-            state = env.reset()
-            env.creat_ALG()
-            while True:
-                action = train_agent.action(state)
-                state, reward, done = env.step(action)
-                e_reward += reward
-                step += 1
-                env.render()
-                if done:
-                    print('Episode: ', episode, 'Step', step, "Reward:", e_reward)
                     break

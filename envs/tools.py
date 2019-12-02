@@ -125,35 +125,38 @@ def random_aircraft_pos(init_scen, aircraft):
     return aircraft
 
 
-def init_pos(aircraft, ap_pos, envs_type):
+def init_pos(aircraft, ap_pos, ap_heading):
     """
-    根据场景类型初始化飞机和进近点坐标
-    :param aircraft:飞机
-    :param ap_pos:进近点
-    :param envs_type:场景类型
-    :return:aircraft, pos
+    param:
+        aircraft:               舰载机
+        ap_pos:                 最终进近点坐标
+        ap_heading:             最终进近点朝向
+    return:
+        舰载机和最终进近点坐标、朝向
+    主要逻辑：
+        根据场景类型，初始化舰载机和最终进近点坐标、朝向
     """
     area = args.map_area * 0.8
-    if envs_type == "2D_xy":
-        # aircraft.ac_pos = np.array([np.random.randint(-args.map_area*0.8, 0),
-        #                            np.random.randint(-args.map_area*0.8,args.map_area*0.8)])
-        # aircraft.ac_pos = np.append(aircraft.ac_pos, 0)
-        aircraft.ac_pos = np.array([-10000.0, 0.0, 0.0])
+    if args.envs_type == "2D_xy":
+        aircraft.ac_pos = np.array([np.random.randint(-area, 0),
+                                    np.random.randint(-area, area),
+                                    0])
         ap_pos = np.array([0.0, 0.0, 0.0])
-    elif envs_type == "3D_xz":
-        # aircraft.ac_pos = np.array(np.random.uniform(-area, area),
-        #                             0,
-        #                             np.random.uniform(0, 5000))
+    elif args.envs_type == "3D_xz":
+        aircraft.ac_pos = np.array(np.random.randint(-area, area),
+                                   0,
+                                   5000)
         ap_pos = np.array([0.0, 0.0, 0.0])
-    elif envs_type == "3D":
-        # aircraft.ac_pos = np.array(np.random.uniform(-area, area),
-        #                             np.random.uniform(-area, area),
-        #                             5000)
+    elif args.envs_type == "3D":
+        aircraft.ac_pos = np.array(np.random.randint(-area, area),
+                                   np.random.randint(-area, area),
+                                   5000)
         ap_pos = np.array([0.0, 0.0, 0.0])
     else:
         raise Exception("envs_type error")
-    return aircraft, ap_pos
-
+    aircraft.ac_heading = 0
+    ap_heading = 0
+    return aircraft, ap_pos, ap_heading
 
 
 # ===========================================
@@ -173,12 +176,14 @@ def get_state(aircraft_a, aircraft_b, adv_count):
                              aircraft_b.ac_bank_angle / 80, adv_count / 10]))
     return state
 
+
 def get_state_direct_pos(aircraft_a, aircraft_b, adv_count):
     state = np.concatenate(((aircraft_b.ac_pos - aircraft_a.ac_pos) / args.map_area,
-                            aircraft_b.ac_pos/args.map_area, aircraft_a.ac_pos/args.map_area,
-                           [aircraft_b.ac_heading / 180, aircraft_a.ac_heading / 180,
+                            aircraft_b.ac_pos / args.map_area, aircraft_a.ac_pos / args.map_area,
+                            [aircraft_b.ac_heading / 180, aircraft_a.ac_heading / 180,
                              aircraft_b.ac_bank_angle / 80, adv_count / 10]))
     return state
+
 
 REGISTRY_STATE = {}
 REGISTRY_STATE['orign_state'] = get_state
