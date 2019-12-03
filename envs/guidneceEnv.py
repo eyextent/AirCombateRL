@@ -85,7 +85,7 @@ class Env(object):
 
     # Partially Observable Env for Multi-Agent
     # 部分可观察的多智能体环境使用
-    def get_state(self):
+    def get_state(self, *args):
         raise NotImplementedError
 
     def get_state_shape(self):
@@ -122,7 +122,7 @@ class GuidenceEnvOverload(Env):
         # 强化学习动作接口
         self.n_actions = len(self.aircraft.action_space)    # 动作空间
         self.action_dim = self.n_actions                    # 动作空间长度
-        self.state_dim = len(self._get_state(self.aircraft, self.ap_pos, self.ap_heading, self.last_action))    # 状态空间长度
+        self.state_dim = len(self.get_state(self.aircraft, self.ap_pos, self.ap_heading, self.last_action))    # 状态空间长度
         # reward条件
         self.success = 0
 
@@ -135,7 +135,7 @@ class GuidenceEnvOverload(Env):
         # 初始化舰载机和最终进近点坐标、朝向
         self.aircraft, self.ap_pos, self.ap_heading = init_pos(self.aircraft, self.ap_pos, self.ap_heading)
         # 返回状态
-        state = self._get_state(self.aircraft, self.ap_pos, self.ap_heading, self.last_action)
+        state = self.get_state(self.aircraft, self.ap_pos, self.ap_heading, self.last_action)
         return state
 
     def _get_reward(self, aircraft, ap_pos, ap_heading):
@@ -181,11 +181,11 @@ class GuidenceEnvOverload(Env):
             if done is True:
                 break
         self.oil = self.oil - 1
-        s = self._get_state(self.aircraft, self.ap_pos, self.ap_heading, self.last_action)
+        s = self.get_state(self.aircraft, self.ap_pos, self.ap_heading, self.last_action)
         self.last_action = action
         return s, reward, done
 
-    def _get_state(self, aircraft, ap_pos, ap_heading, last_action):
+    def get_state(self, aircraft, ap_pos, ap_heading, last_action):
         """
         param:
             aircraft:               舰载机
@@ -197,10 +197,12 @@ class GuidenceEnvOverload(Env):
         主要逻辑：
             根据舰载机和最终进近点坐标、朝向和舰载机油量，上一次机动动作计算状态值
         """
-        state = np.concatenate(((aircraft.ac_pos - ap_pos) / args.map_area,
-                                [(aircraft.ac_heading - ap_heading) / 180,
-                                self.oil / args.Sum_Oil,
-                                last_action / (self.n_actions - 1)]))
+        state = np.array([aircraft.ac_pos[0] - ap_pos[0] / args.map_area,
+                          aircraft.ac_pos[1] - ap_pos[1] / args.map_area,
+                          aircraft.ac_pos[2] - ap_pos[2] / 8000,
+                          (aircraft.ac_heading - ap_heading) / 180,
+                          self.oil / args.Sum_Oil,
+                          last_action / (self.n_actions - 1)])
         return state
 
     def _transfer_action(self, action):
