@@ -1,18 +1,108 @@
 import numpy as np
 import time
 import sys
-from envs.tools import init_pos
+from envs.customization import init_pos
 sys.path.append('..')
 from argument.dqnArgs import args
 from envs.unit import REGISTRY as registry_unit
 from common.utlis import distance
-from envs.airCombateEnv import Env
 if sys.version_info.major == 2:
     import Tkinter as tk
 else:
     import tkinter as tk
 
 np.set_printoptions(suppress=True)
+
+
+class Env(object):
+    def __init__(self):
+        '''
+        基类构造函数：
+            还至少需要设置 state_space, action_space, state_dim, action_dim
+            包含 单位实例列表 red_unit_list, blue_unit_list
+        '''
+        # 地图设置
+        self.AREA = args.map_area  # 地图范围
+        # 可视化显示参数
+        self.SCALE = args.map_scale  # 比例尺
+        self.SCOPE = self.AREA * self.SCALE  # Tkinter显示范围
+
+        # 训练参数
+        self.t = args.map_t  # 时间间隔（步长，秒)
+        self.td = self.t / args.map_t_n  # 每个步长计算次数
+        self.Sum_Oil = 100  # 油量，即每个episode的最大step数量
+
+        ## 飞机列表
+        self.red_unit_list = []
+        self.blue_unit_list = []
+
+    def _seed(self, seed):
+        '''
+        设置随机种子
+        '''
+        np.random.seed(seed)
+
+    def reset(self):
+        '''
+        环境初始化
+        输出：
+            当前状态（所有飞机的当前状态）
+        '''
+        raise NotImplementedError
+
+    def step(self, *action):
+        '''
+        输入：
+            动作（环境内所有飞机的动作）
+        输出：
+            <下一状态，奖励值，done>，当前状态可以省略
+
+        待扩展：
+            局部可观察obs，额外状态信息（全局状态）state
+        '''
+        raise NotImplementedError
+
+    def _get_reward(self, *args):
+        '''
+        根据当前飞机信息，给出奖励函数。
+        最好是输入设置为当前环境能够给出的所有信息，返回的是奖励值。
+        这样当使用时可以不用管中间的逻辑实现，只需看输入、输出；
+        当想创建新的奖励函数模型时，只需要根据环境所能提供的信息，来实现此函数内逻辑的实现。
+        '''
+        raise NotImplementedError
+
+    def render(self):
+        '''
+        环境的可视化显示
+        '''
+        raise NotImplementedError
+
+    def close(self):
+        '''
+        可视化关闭
+        '''
+        raise NotImplementedError
+
+    # Partially Observable Env for Multi-Agent
+    # 部分可观察的多智能体环境使用
+    def get_state(self):
+        raise NotImplementedError
+
+    def get_state_shape(self):
+        raise NotImplementedError
+
+    def get_agent_obs(self, agent_id):
+        raise NotImplementedError
+
+    def get_agent_obs_shape(self):
+        raise NotImplementedError
+
+    def _get_avail_actions(self):
+        raise NotImplementedError
+
+    def _get_agent_avail_actions(self, agent_id):
+        raise NotImplementedError
+
 
 class GuidenceEnvOverload(Env):
     def __init__(self):
@@ -180,7 +270,10 @@ if __name__ == '__main__':
     A = [1, 1, 2, 1, 2, 1, 0, 0, 0, 3, 1, 0, 0, 0, 0, 0, 1, 1, 1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 2, 4, 2, 4, 2, 4, 4, 2,
      0, 2, 2, 4, 4, 2, 0, 3, 3, 2, 2, 2, 2, 2, 2, 3, 2, 3 , 3, 2, 2, 4, 2, 2, 2, 2, 4, 4, 4, 1, 4, 4, 1, 4, 4, 4, 4, 4,
      4, 4, 4, 4, 2, 2, 2, 0, 4, 2, 2, 2, 2, 2, 2, 2, 1, 0, 2, 2, 1, 1, 1, 1, 1]
-    for a in A:
-        s_b, reward_r, done = env.step(a)
-        print(s_b, reward_r, done)
-        env.render()
+    while(True):
+        s_b, reward_r, done = env.step(4)
+        print(env.aircraft.ac_pos)
+    # for a in A:
+    #     s_b, reward_r, done = env.step(a)
+    #     print(s_b, reward_r, done)
+    #     env.render()

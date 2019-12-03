@@ -98,6 +98,7 @@ class AircraftOverload(Aircraft):
         self.ac_speed_max = 300                     # 最小飞行速度
         self.ac_heading = 0                         # 朝向角/偏角
         self.ac_pitch = 0                           # 俯仰角/倾角
+        self.ac_pitch_max = 60
         self.ac_roll = 0                            # 滚转角
         self.rate_roll = 40                         # 滚转角变化率
         self.roll_max = 80                          # 滚转角最大值
@@ -131,10 +132,10 @@ class AircraftOverload(Aircraft):
         ##### 检查倾角 /////////记录变化之前和变化之后相乘为负即归零，判断是不是爬升俯冲
         if last_pitch * self.ac_pitch < 0 and (action != 3 or action != 4):
             self.ac_pitch = 0
-        if self.ac_pitch > 180:
-            self.ac_pitch = self.ac_pitch - 360
-        elif self.ac_pitch < -180:
-            self.ac_pitch = self.ac_pitch + 360
+        if action == 3:     # 飞机在执行爬升动作时，检查俯仰角是否超出范围
+            self.ac_pitch = min(self.ac_pitch, self.ac_pitch_max)
+        elif action == 4:   # 飞机在执行俯冲动作时，检查俯仰角是否超出范围
+            self.ac_pitch = max(self.ac_pitch, -self.ac_pitch_max)
         #####
         # 偏角
         self.ac_heading = self.ac_heading + rate_heading * 180 * self.t / math.pi
@@ -257,26 +258,26 @@ REGISTRY["default"] = AircraftDefault
 REGISTRY["overload"] = AircraftOverload
 # REGISTRY["name_new"] = NewClass
 
-import  csv
-if __name__ == '__main__':
-    fileHeader = ["x", "y", "z", "heading", "pitch", "roll", "spd"]
-    for i in range(7):
-        for j in range(7):
-            if i == j:
-                continue
-            A = [i,j]
-            name = "[" + str(A[0]) + "," + str(A[1]) + "]"
-            csvFile = open(name + ".csv", "w", newline='')
-            writer = csv.writer(csvFile)
-            writer.writerow(fileHeader)
-            envs = AircraftOverload()
-            line = [envs.ac_pos[0], envs.ac_pos[1], envs.ac_pos[2], envs.ac_heading, envs.ac_pitch, envs.ac_roll, envs.ac_speed]
-            writer.writerow(line)
-            for a in A:
-                for k in range(5):
-                    envs.move(a)
-                    line = [envs.ac_pos[0], envs.ac_pos[1], envs.ac_pos[2], envs.ac_heading, envs.ac_pitch, envs.ac_roll,
-                            envs.ac_speed]
-                    writer.writerow(line)
-            csvFile.close()
-            envs.show(name)
+# import  csv
+# if __name__ == '__main__':
+#     fileHeader = ["x", "y", "z", "heading", "pitch", "roll", "spd"]
+#     for i in range(7):
+#         for j in range(7):
+#             if i == j:
+#                 continue
+#             A = [i,j]
+#             name = "[" + str(A[0]) + "," + str(A[1]) + "]"
+#             csvFile = open(name + ".csv", "w", newline='')
+#             writer = csv.writer(csvFile)
+#             writer.writerow(fileHeader)
+#             envs = AircraftOverload()
+#             line = [envs.ac_pos[0], envs.ac_pos[1], envs.ac_pos[2], envs.ac_heading, envs.ac_pitch, envs.ac_roll, envs.ac_speed]
+#             writer.writerow(line)
+#             for a in A:
+#                 for k in range(5):
+#                     envs.move(a)
+#                     line = [envs.ac_pos[0], envs.ac_pos[1], envs.ac_pos[2], envs.ac_heading, envs.ac_pitch, envs.ac_roll,
+#                             envs.ac_speed]
+#                     writer.writerow(line)
+#             csvFile.close()
+#             envs.show(name)

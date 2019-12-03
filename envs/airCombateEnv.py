@@ -5,8 +5,8 @@ import numpy as np
 import math
 import time
 import sys
-from envs.tools import random_pos, init_pos
-from envs.tools import REGISTRY_STATE as registry_state
+from envs.customization import random_pos, init_pos
+from envs.customization import REGISTRY_STATE as registry_state
 
 sys.path.append('..')
 from argument.dqnArgs import args

@@ -142,15 +142,15 @@ def init_pos(aircraft, ap_pos, ap_heading):
                                     np.random.randint(-area, area),
                                     0])
         ap_pos = np.array([0.0, 0.0, 0.0])
-    elif args.envs_type == "3D_xz":
-        aircraft.ac_pos = np.array(np.random.randint(-area, area),
+    elif args.envs_type == "2D_xz":
+        aircraft.ac_pos = np.array([np.random.randint(-area, area),
                                    0,
-                                   5000)
+                                   5000])
         ap_pos = np.array([0.0, 0.0, 0.0])
     elif args.envs_type == "3D":
-        aircraft.ac_pos = np.array(np.random.randint(-area, area),
+        aircraft.ac_pos = np.array([np.random.randint(-area, area),
                                    np.random.randint(-area, area),
-                                   5000)
+                                   5000])
         ap_pos = np.array([0.0, 0.0, 0.0])
     else:
         raise Exception("envs_type error")
