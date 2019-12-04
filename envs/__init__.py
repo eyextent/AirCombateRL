@@ -10,7 +10,3 @@ REGISTRY["guidence"] = AirCombatEnvOverload
 
 def make(name):
 	return REGISTRY[name]()
-
-
-
-

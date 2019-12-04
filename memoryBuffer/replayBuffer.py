@@ -108,11 +108,11 @@ class ReplayBuffer(Buffer):
 class SuperviseLearningBuffer(Buffer):
     def __init__(self, capacity, flag_piexl=0):
         super(SuperviseLearningBuffer, self).__init__(capacity, flag_piexl)
-        self.Transition = collections.namedtuple("Pair", ["state", "action"])
+        self.Pair = collections.namedtuple("Pair", ["state", "action"])
 
     def store(self, state, action):
         # capacity 是 None 时，表示不设置最大储存空间
-        if not self.capacity is None:
+        if self.capacity is not None:
             if self.size > self.capacity:
                 self.replay_buffer.pop(0)
                 self._update_size()

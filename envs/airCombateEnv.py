@@ -364,6 +364,9 @@ class AirCombatEnv(Env):
             time.sleep(0.1)
             self.Tk.destroy()
 
+    def close(self):
+        self.Tk.destroy()
+
     def xyz2abc(self, pos):
         pos_show = np.array([0, 0])
         pos_show[0] = pos[0] * args.map_scale + args.map_area * args.map_scale
