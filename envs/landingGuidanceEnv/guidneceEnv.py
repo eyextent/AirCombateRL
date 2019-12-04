@@ -1,7 +1,7 @@
 import numpy as np
 import time
 import sys
-from envs.customization import init_pos
+from envs.landingGuidanceEnv.customization import init_pos
 sys.path.append('..')
 from argument.dqnArgs import args
 from envs.unit import REGISTRY as registry_unit
