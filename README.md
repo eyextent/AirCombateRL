@@ -485,7 +485,7 @@ doc/
               B的AA和ATA角
           主要逻辑：
               分别输入两架飞机的位置坐标 和 朝向角，
-              计算 第二架飞机B的 ATA 和 AA 角（见论文） 
+              计算 第二架飞机B的 ATA 和 AA 角（见doc/pic/envs_airCombateEnv_001.png） 
           """
           xxxxxx
           xxxxxx
