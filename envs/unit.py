@@ -246,8 +246,8 @@ class AircraftOverload(Aircraft):
         fig = plt.figure()
         ax1 = plt.axes(projection='3d')
         ax1.plot3D(self.x, self.y, self.z, 'gray')  # 绘制空间曲线
-        # ax1.set_xlim([-x, x])
-        # ax1.set_ylim([-x, x])
+        ax1.set_xlim([-1500, 1000])
+        ax1.set_ylim([-1500, 1000])
         # ax1.set_zlim([5000-x, 5000+x])
         plt.savefig(name)
         plt.show()
@@ -281,3 +281,25 @@ REGISTRY["overload"] = AircraftOverload
 #                     writer.writerow(line)
 #             csvFile.close()
 #             envs.show(name)
+
+if __name__ == '__main__':
+    aircraft = AircraftOverload()
+    for a in range(29):
+        for i in range(5):
+            aircraft.move(1)
+            print(aircraft.ac_heading)
+            if aircraft.ac_heading == 90.14943212278924:
+                print(a)
+    for a in range(39):
+        for i in range(5):
+            aircraft.move(2)
+            print(aircraft.ac_heading)
+            if aircraft.ac_heading == 89.95018929240386:
+                print(a)
+    for a in range(15):
+        for i in range(5):
+            aircraft.move(1)
+            print(aircraft.ac_heading)
+            if aircraft.ac_heading == 89.95018929240386:
+                print(a)
+    aircraft.show("aaa")
