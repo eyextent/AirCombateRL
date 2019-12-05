@@ -21,7 +21,7 @@ parser.add_argument("--episode", type=int, default="2000000", help="训练的最
 parser.add_argument("--store", type=int, default="10000", help="初始化经验池时运行的episode数")
 parser.add_argument("--test_episode", type=int, default="100", help="测试时运行的episode数")
 parser.add_argument("--train_episode", type=int, default="100", help="每训练多少个episode后启动测试")
-parser.add_argument("--epsilon_decay", type=int, default="1", help="epsilon_decay=1时，在样本储存阶段也递减elsilon;否则训练阶段才递减")
+parser.add_argument("--observe_step", type=int, default="100000", help="观察的步数，即在此阶段只是储存样本，不进行训练")
 
 # models
 parser.add_argument("--net_frame", type=str, default='mlp', help="[mlp, cnn2mlp, cnn2rnn2mlp]")
@@ -31,9 +31,10 @@ parser.add_argument("--batch_size", type=int, default="256")
 parser.add_argument("--gamma", type=float, default="0.99")
 parser.add_argument("--learning_rate", type=float, default="0.00005", help="学习率")
 parser.add_argument("--initial_epsilon", type=float, default="1.0", help="初始探索概率")
+parser.add_argument("--epsilon_decay_during_obser", type=int, default="1", help="epsilon_decay_during_obser=1时，在样本储存阶段也递减elsilon;否则训练阶段才递减")
 parser.add_argument("--decay_rate", type=float, default="1.0", help="探索率下降幅度")
 parser.add_argument("--replay_size", type=int, default="100000")
-
+parser.add_argument("--flag_target_net", type=int, default="0", help="=1时，使用target网络；=0时，不使用taget网络")
 
 # envs
 parser.add_argument("--unit_type", type=str, default='default',help="[default,]")

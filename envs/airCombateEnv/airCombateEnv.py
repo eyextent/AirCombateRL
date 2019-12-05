@@ -5,8 +5,8 @@ import numpy as np
 import math
 import time
 import sys
-from envs.customization import random_pos, init_pos
-from envs.customization import REGISTRY_STATE as registry_state
+from envs.airCombateEnv.customization import random_pos, init_pos
+from envs.airCombateEnv.customization import REGISTRY_STATE as registry_state
 
 sys.path.append('..')
 from argument.dqnArgs import args
@@ -363,6 +363,9 @@ class AirCombatEnv(Env):
         if self.done:
             time.sleep(0.1)
             self.Tk.destroy()
+
+    def close(self):
+        self.Tk.destroy()
 
     def xyz2abc(self, pos):
         pos_show = np.array([0, 0])
