@@ -2,7 +2,8 @@ import numpy as np
 import yaml
 from easydict import EasyDict as edict
 import os
-base_dir = os.path.dirname(__file__)
+base_dir = os.path.dirname(os.path.dirname(__file__))
+#print(base_dir)
 dict = edict()
 
 

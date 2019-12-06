@@ -1,7 +1,6 @@
 #from runner.selfPlayNANU import output
 #from common.utlis import set_seed
-from config import merge
-import argparse
+from common.config import merge
 # from config import yaml_cfg_all
 from easydict import EasyDict as edict
 

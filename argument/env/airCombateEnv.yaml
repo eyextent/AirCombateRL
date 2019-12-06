@@ -22,3 +22,4 @@ airCombate:
     random_init_pos_r: 1 #[0 or 1])
 
     state_settingtype: orign_state #[orign_statestate_direct_pos])
+    #test
