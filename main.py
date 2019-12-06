@@ -1,6 +1,9 @@
-from runner.selfPlayNANU import output
-from common.utlis import set_seed
-
+#from runner.selfPlayNANU import output
+#from common.utlis import set_seed
+from config import merge
+import argparse
+# from config import yaml_cfg_all
+from easydict import EasyDict as edict
 
 if __name__ == "__main__":
     '''
@@ -9,4 +12,10 @@ if __name__ == "__main__":
     高阶逻辑；
     等...
     '''
-    run()
+    arg = edict()
+    # param = ["env1/envConfig","algConfig","env1/env1Config"]
+    param = {'env': 'airCombateEnv', 'algs': 'dqn', 'memory': 'memory'}
+    arg = merge(param)
+    print(arg.name)
+    print(arg.memoryname)
+    # run()
