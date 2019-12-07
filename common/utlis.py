@@ -25,8 +25,6 @@ def is_cuda():
 Variable = lambda *args, **kwargs: autograd.Variable(*args, **kwargs).cuda() if is_cuda() else autograd.Variable(*args, **kwargs)
 
 
-
-
 # ===========================================
 #                 algorithm
 # =========================================== 
@@ -46,3 +44,24 @@ def distance(agent1:list, agent2:list):
         dis = dis + (pos1 - pos2)*(pos1 - pos2)
     dis = math.sqrt(dis) 
     return dis
+
+
+
+
+# ===========================================
+#                   others
+# ===========================================
+def judge_type(arg):
+    if isinstance(arg, str):
+        return 'str'
+    elif isinstance(arg, int):
+        return 'int'
+    elif isinstance(arg, float):
+        return 'float'
+    elif isinstance(arg, bool):
+        return 'int'
+    elif isinstance(arg, list):
+        return 'list'
+    else:
+        raise Exception("Invalid type!", arg)
+    
