@@ -1,9 +1,3 @@
-# interactor
-episode: 2000000  #训练的最大episode数)
-store: 10000  #初始化经验池时运行的episode数)
-test_episode: 100  #测试时运行的episode数)
-train_episode: 100  #每训练多少个episode后启动测试)
-observe_step: 100000  #观察的步数，即在此阶段只是储存样本，不进行训练)
 
 # models
 net_frame: 'mlp'  #[mlp, cnn2mlp, cnn2rnn2mlp])
@@ -17,13 +11,6 @@ epsilon_decay_during_obser: 1  #epsilon_decay_during_obser=1时，在样本储�
 decay_rate: 1.0  #探索率下降幅度)
 replay_size: 100000  #经验池大小
 flag_target_net: 0  #=1时，使用target网络；=0时，不使用taget网络
-# unit
-Sum_Oil: 1000 #油量，即每个episode的最大step数量
 
-# utlis
-seed: 125
 
-source_path: ../result #保存路径
-experiment_name: blue_red_game  #保存文件夹的名字
-checkpoint_folder_name: _saved_networks/  #参数保存文件夹的名字，加/结尾
-file_name: _agent.pkl #参数保存文件名+pkl
+

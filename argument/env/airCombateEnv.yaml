@@ -26,3 +26,7 @@ random_init_pos_b: 1 #[0 or 1])
 random_init_pos_r: 1 #[0 or 1])
 
 state_setting: orign_state #[orign_statestate_direct_pos]) #test
+
+
+# unit
+Sum_Oil: 1000 #油量，即每个episode的最大step数量
