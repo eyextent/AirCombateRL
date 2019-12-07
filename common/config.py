@@ -33,7 +33,11 @@ def args_wrapper_parser(args):
     '''
     parser = argparse.ArgumentParser()
     for key, value in args.items():
-        eval("parser.add_argument('--%s', type=%s, default='%s')"%(key, judge_type(value), value))
+        tp = judge_type(value)
+        if tp == 'list':
+            eval("parser.add_argument('--%s', default='%s')"%(key, value))
+        else:
+            eval("parser.add_argument('--%s', type=%s, default='%s')"%(key, tp, value))
     args = parser.parse_args()
     return args
 
@@ -45,6 +49,8 @@ def args_wrapper_path(args):
     if not os.path.exists(args.save_path):
         os.makedirs(args.save_path)
     return args
+
+
 # def cfg_from_file(filename,subfolder):
 #     if subfolder==None:
 #         with open(os.path.join(base_dir, "config","{}.yaml".format(filename)), 'r', encoding='utf-8') as f:
