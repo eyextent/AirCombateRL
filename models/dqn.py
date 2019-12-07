@@ -53,7 +53,6 @@ class DQN(object):
         raise NotImplementedError
 
 
-
 class DQN2013(DQN):
     def __init__(self, state_dim, n_action, is_train=False, is_based=False, scope=None):
         super(DQN2013, self).__init__(state_dim, n_action)
@@ -327,18 +326,12 @@ class DQN4NFSP(DQN):
                 self.epsilon = self.epsilon * args.decay_rate
 
         if random.random() > self.eta:
-            state   = U.Variable(torch.FloatTensor(state.astype(np.float32)).unsqueeze(0))
-            logits = self.model_sl(state)
-            action_max_value, index = torch.max(logits, 1)
-            action = index.item()
             is_best_response = False
+            self.average_stargiey(state)
         else:
             is_best_response = True
             if random.random() > self.epsilon:
-                state   = U.Variable(torch.FloatTensor(state.astype(np.float32)).unsqueeze(0))
-                q_value = self.model_rl(state)
-                action_max_value, index = torch.max(q_value, 1)
-                action = index.item()
+                self.best_response(state)
             else:
                 action = random.randrange(self.n_action)
         return action, is_best_response
