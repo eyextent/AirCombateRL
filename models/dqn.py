@@ -327,11 +327,11 @@ class DQN4NFSP(DQN):
 
         if random.random() > self.eta:
             is_best_response = False
-            self.average_stargiey(state)
+            action = self.average_stargiey(state)
         else:
             is_best_response = True
             if random.random() > self.epsilon:
-                self.best_response(state)
+                action = self.best_response(state)
             else:
                 action = random.randrange(self.n_action)
         return action, is_best_response
