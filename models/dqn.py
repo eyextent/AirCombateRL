@@ -204,7 +204,7 @@ class DQN4NFSP(DQN):
         # self.learning_rate_rl = args.learning_rate_rl
         # self.learning_rate_sl = args.learning_rate_sl
 
-        self.eta = 0.5
+        self.eta = 0.1
         # self.eta = args.eta
 
         self.save_path = args.save_path
@@ -322,7 +322,7 @@ class DQN4NFSP(DQN):
         '''
         if epsilon_decay:
             if self.epsilon > 0.1:
-                self.epsilon = self.epsilon - 0.000005
+                self.epsilon = self.epsilon - 0.00005
             else:
                 self.epsilon = self.epsilon * args.decay_rate
 
