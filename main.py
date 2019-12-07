@@ -1,8 +1,9 @@
 #from runner.selfPlayNANU import output
-#from common.utlis import set_seed
+from common.utlis import set_seed
 from common.config import merge
+from argument.argManage import args
+import torch
 # from config import yaml_cfg_all
-from easydict import EasyDict as edict
 
 if __name__ == "__main__":
     '''
@@ -11,10 +12,10 @@ if __name__ == "__main__":
     高阶逻辑；
     等...
     '''
-    arg = edict()
+    print(torch.__version__)
     # param = ["env1/envConfig","algConfig","env1/env1Config"]
-    param = {'env': 'airCombateEnv', 'algs': 'dqn', 'memory': 'memory'}
-    arg = merge(param)
-    print(arg.name)
-    print(arg.memoryname)
+    print(args.convs[1])
+    print(args.learning_rate)
+    print(args.memoryname)
+    torch.
     # run()

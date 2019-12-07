@@ -9,8 +9,8 @@ import numpy as np
 import random
 import sys
 sys.path.append("..")
-from argument.dqnArgs import args
-
+#from argument.dqnArgs import args
+from argument.argManage import args
 class Buffer(object):
     '''
     基类：包含 图像样本的预处理过程，实现 pop、__len__ 函数

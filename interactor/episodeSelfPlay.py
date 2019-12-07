@@ -2,12 +2,11 @@
 # -*- coding: utf-8 -*-
 
 import xlwt
-import time
 import sys
 sys.path.append('..')
 import common.alloc as alloc
-from argument.dqnArgs import args
-
+#from argument.dqnArgs import args
+from argument.argManage import args
 
 workbook=xlwt.Workbook(encoding='utf-8')
 showbook = xlwt.Workbook(encoding="utf-8")

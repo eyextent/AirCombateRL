@@ -6,11 +6,11 @@ import sys
 sys.path.append('..')
 import envs
 from models.dqn import DQN2013 as DQN
-from argument.dqnArgs import args
+#from argument.dqnArgs import args
 import common.alloc as alloc
 from common.utlis import set_seed
 from interactor.episodeSelfPlay import run_AirCombat_selfPlay
-
+from argument.argManage import args
 def run():
     env = envs.make(args.env_name)
 

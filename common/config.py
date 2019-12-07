@@ -22,7 +22,7 @@ def merge(param):
             continue
         else:
             dict.update(cfg_from_file(key,value))
-    print(dict)
+   # print(dict)
     return dict
 # def cfg_from_file(filename,subfolder):
 #     if subfolder==None:

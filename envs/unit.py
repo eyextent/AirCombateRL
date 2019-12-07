@@ -10,7 +10,8 @@ import numpy as np
 import sys
 
 sys.path.append('..')
-from argument.dqnArgs import args
+#from argument.dqnArgs1 import args
+from argument.argManage import args
 
 
 class Aircraft(object):
