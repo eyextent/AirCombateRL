@@ -1,6 +1,6 @@
 import numpy as np
-from argument.dqnArgs import args
-
+#from argument.dqnArgs import args
+from argument.argManage import args
 np.random.seed(args.env_random_seed)
 
 

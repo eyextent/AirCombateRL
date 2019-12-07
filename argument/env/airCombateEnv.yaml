@@ -1,0 +1,28 @@
+
+env_name: airCombate #游戏名字
+flag_is_train: 1 #flag_IsTrain = 1, 一个训练，一个使用； flag_IsTrain = 0, 两个都是在使用
+flag_focus_blue: 1  #flag_focus_blue = 1 时训练agent_blue； flag_focus_blue = 0 时训练agent_red
+
+unit_type: default  #[default,]
+red_unit_type_list: default #飞机类型包括：[default,] MvN环境中使用
+blue_unit_type_list: default   #  #飞机类型包括：[default,]) # MvN环境中使用
+
+envs_type: 2D_xy #  #场景类型：2D_xy2D_xz3D)
+
+map_area: 3000  #  #设定地图范围)
+map_scale: 0.1   #地图比例尺)
+map_t: 0.5  #时间间隔（步长，秒))
+map_t_n: 5  #每个步长计算次数)
+env_random_seed: 2  #环境随机种子)
+
+init_scen: 0  #初始想定模式包括：0随机，1进攻，2防御，3同向，4中立)
+random_r: 0  #红方是否在初始化过程中随机)
+random_b: 1  #蓝方是否在初始化过程中随机)
+
+G: 9.81 #重力加速度)
+roll_rate: 40 #滚转角变化率)
+
+random_init_pos_b: 1 #[0 or 1])
+random_init_pos_r: 1 #[0 or 1])
+
+state_setting: orign_state #[orign_statestate_direct_pos]) #test

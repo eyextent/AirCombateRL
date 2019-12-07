@@ -5,13 +5,13 @@ import numpy as np
 import math
 import time
 import sys
-# sys.path.append('..')
+
 sys.path.append('../..')
-from envs.airCombateEnv.customization import random_pos, init_pos
+from envs.airCombateEnv.customization import random_pos
 from envs.airCombateEnv.customization import REGISTRY_STATE as registry_state
-from argument.dqnArgs import args
+#from argument.dqnArgs import args
+from argument.argManage import args
 from envs.unit import REGISTRY as registry_unit
-from common.utlis import distance
 
 if sys.version_info.major == 2:
     import Tkinter as tk

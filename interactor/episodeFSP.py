@@ -1,10 +1,10 @@
 #!usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import time
 import sys
 sys.path.append('..')
-from argument.dqnArgs import args
+#from argument.dqnArgs import args
+from argument.argManage import args
 
 def run_NFSP(env, agent_blue, agent_red):
     if args.flag_is_train:

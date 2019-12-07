@@ -2,12 +2,14 @@ import sys
 sys.path.append('..')
 import envs
 from models.dqn import DQN4NFSP as DQN
-from argument.dqnArgs import args
+#from argument.dqnArgs import args
 from common.utlis import set_seed
 from interactor.episodeFSP import run_NFSP
-
-
+from common.config import merge
+from argument.argManage import args
 def run():
+
+    print(args)
     env = envs.make(args.env_name)
 
  
@@ -23,5 +25,6 @@ if __name__ == "__main__":
     高阶逻辑；
     等...
     '''
+
     set_seed(args.seed)
     run()

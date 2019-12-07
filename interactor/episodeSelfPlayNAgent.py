@@ -1,13 +1,12 @@
 #!usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import time
 import sys
 sys.path.append('..')
-import common.alloc as alloc
-from argument.dqnArgs import args
 
 
+#from argument.dqnArgs import args
+from argument.argManage import args
 def run_AirCombat_selfPlay(env, train_agent_list, use_agent_list, train_agent_name):  
     '''
     Params：

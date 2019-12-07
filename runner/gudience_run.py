@@ -5,8 +5,8 @@ from interactor.episodeTrainer import run
 sys.path.append('..')
 import envs
 from models.dqn import DQN2013
-from argument.dqnArgs import args
-
+#from argument.dqnArgs import args
+from argument.argManage import args
 from common.utlis import set_seed
 if __name__ == '__main__':
     args.Sum_Oil = 100
