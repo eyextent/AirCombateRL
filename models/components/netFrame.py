@@ -4,8 +4,8 @@
 import torch.nn as nn
 import sys
 sys.path.append("../..")
-from argument.dqnArgs import args
-
+#from argument.dqnArgs import args
+from argument.argManage import args
 
 class Net_MLP(nn.Module):
     def __init__(self, num_inputs, num_actions, hiddens=args.hidden_units):

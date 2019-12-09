@@ -1,0 +1,16 @@
+
+# models
+net_frame: 'mlp'  #[mlp, cnn2mlp, cnn2rnn2mlp])
+hidden_units: [128, 128]  #每个隐藏层的神经元数量)
+convs: [[32, 8, 4], [64, 4, 2], [64, 3, 1]]  #每个卷积层设置
+batch_size: 256
+gamma: 0.99 
+learning_rate: 0.00005  #学习率)
+initial_epsilon: 1.0  #初始探索概率)
+epsilon_decay_during_obser: 1  #epsilon_decay_during_obser=1时，在样本储存阶段也递减elsilon;否则训练阶段才递减)
+decay_rate: 1.0  #探索率下降幅度)
+replay_size: 100000  #经验池大小
+flag_target_net: 0  #=1时，使用target网络；=0时，不使用taget网络
+
+
+

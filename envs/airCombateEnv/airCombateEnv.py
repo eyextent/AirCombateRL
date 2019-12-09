@@ -5,13 +5,13 @@ import numpy as np
 import math
 import time
 import sys
-from envs.airCombateEnv.customization import random_pos, init_pos
-from envs.airCombateEnv.customization import REGISTRY_STATE as registry_state
 
-sys.path.append('..')
-from argument.dqnArgs import args
+sys.path.append('../..')
+from envs.airCombateEnv.customization import random_pos
+from envs.airCombateEnv.customization import REGISTRY_STATE as registry_state
+#from argument.dqnArgs import args
+from argument.argManage import args
 from envs.unit import REGISTRY as registry_unit
-from common.utlis import distance
 
 if sys.version_info.major == 2:
     import Tkinter as tk
@@ -316,25 +316,6 @@ class AirCombatEnv(Env):
                         + (pos_a[1] - pos_b[1]) * (pos_a[1] - pos_b[1]))
         return dis
 
-    def _get_state(self, aircraft_a, aircraft_b, adv_count):
-        """
-        计算aircraft_b的状态
-        :param aircraft_a:
-        :param aircraft_b:
-        :param adv_count:优势次数
-        :return:aircraft_b的状态
-        """
-        state = np.concatenate(((aircraft_b.ac_pos - aircraft_a.ac_pos) / args.map_area,
-                                [aircraft_b.ac_heading / 180, aircraft_a.ac_heading / 180,
-                                 aircraft_b.ac_bank_angle / 80, adv_count / 10]))
-        return state
-
-    def _get_state_direct_pos(self, aircraft_a, aircraft_b, adv_count):
-
-        state = np.concatenate((aircraft_b.ac_pos/args.map_area, aircraft_a.ac_pos/args.map_area,
-                               aircraft_b.ac_heading / 180, aircraft_a.ac_heading / 180,
-                                 aircraft_b.ac_bank_angle / 80, adv_count / 10))
-
     def creat_ALG(self):
         self.Tk = tk.Tk()
         self.Tk.title('1V1')
@@ -446,3 +427,23 @@ class AirCombatEnvMultiUnit(Env):
         # todo：判断unit_list和action_list的维度匹配
         for unit, action in zip(unit_list, action_list):
             unit.move(action)
+
+
+#环境测试程序
+if __name__ == '__main__':
+    env = AirCombatEnv()
+    env.init_scen = 3
+    args.random_r = 1
+    args.random_b = 1
+    s = env.reset_selfPlay()
+    env.creat_ALG()
+    env.render()
+    while True:
+        if env.done:
+            s = env.reset_selfPlay()
+            env.creat_ALG()
+        #a = np.random.randint(0,3)
+        a_b = 1
+        a_r = 1
+        env.step_selfPlay(a_b,a_r)
+        env.render()

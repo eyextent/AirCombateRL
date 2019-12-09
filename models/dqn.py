@@ -14,7 +14,8 @@ sys.path.append("..")
 from memoryBuffer.replayBuffer import ReplayBuffer, SuperviseLearningBuffer
 from models.components import REGISTRY as registry_net_frame
 import common.utlis as U
-from argument.dqnArgs import args
+#from argument.dqnArgs import args
+from argument.argManage import args
 from common.utlis import set_seed
 
 # todo: 判断需要更全面，添加报错机制
@@ -204,7 +205,7 @@ class DQN4NFSP(DQN):
         # self.learning_rate_rl = args.learning_rate_rl
         # self.learning_rate_sl = args.learning_rate_sl
 
-        self.eta = 0.5
+        self.eta = 0.1
         # self.eta = args.eta
 
         self.save_path = args.save_path
@@ -296,7 +297,6 @@ class DQN4NFSP(DQN):
 
         logits = self.model_sl(state)
         action_one_hot = F.one_hot(action, action.size()[0])
-
         logits_action = logits.gather(1, action.unsqueeze(1)).squeeze(1)
 
         loss_sl = -(torch.log(logits_action)).mean()
@@ -322,7 +322,7 @@ class DQN4NFSP(DQN):
         '''
         if epsilon_decay:
             if self.epsilon > 0.1:
-                self.epsilon = self.epsilon - 0.000005
+                self.epsilon = self.epsilon - 0.00005
             else:
                 self.epsilon = self.epsilon * args.decay_rate
 

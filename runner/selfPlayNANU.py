@@ -5,10 +5,10 @@ import sys
 sys.path.append('..')
 import envs
 from models.dqn import DQN2013 as DQN
-from argument.dqnArgs import args
+#from argument.dqnArgs import args
 import common.alloc as alloc
 from trainer.episodeSelfPlayTrainer import run_AirCombat_selfPlay
-
+from argument.argManage import args
 # 使用的参数：
 args.n_blue
 args.n_red
