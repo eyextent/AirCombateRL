@@ -3,7 +3,10 @@ import yaml
 from easydict import EasyDict as edict
 import os
 import argparse
+import datetime
 from common.utlis import judge_type
+import pprint
+
 base_dir = os.path.dirname(os.path.dirname(__file__))
 #print(base_dir)
 dict = edict()
@@ -41,14 +44,40 @@ def args_wrapper_parser(args):
     args = parser.parse_args()
     return args
 
-def args_wrapper_path(args):
+def args_wrapper_path(args, last_path):
     '''
     主要是对重复训练的保存路径进行封装
     '''
-    args.save_path = args.source_path + '/' + args.experiment_name + '/'
-    if not os.path.exists(args.save_path):
-        os.makedirs(args.save_path)
+
+    # 主要是对重复训练的保存路径进行封装
+    # None
+    data_path_suffix_date = datetime.datetime.now().strftime('_%Y-%m-%d')
+    if last_path is None:
+        args.save_path = args.source_path + '/' + args.experiment_name + data_path_suffix_date + '/'
+        # 判断日期文件夹是否建立
+        if not os.path.exists(args.save_path):
+            os.makedirs(args.save_path)
+        # file_size = len(os.listdir(args.save_path))
+        # args.save_path = args.save_path + str(file_size + 1)
+        # os.makedirs(args.save_path)
+    else:
+        args.save_path = last_path
     return args
+
+# 在当次实验的记录文件下创建配置文件中checkpoint_folder的文件夹
+def args_wrapper_checkpoint_folder(args):
+    file_list = os.listdir(args.save_path)
+    # 根据文件夹的时间降序排列
+    file_list.sort(key=lambda fn: os.path.getmtime(args.save_path + "/" + fn), reverse=True)
+    args.save_path = args.save_path + "/" + file_list[0]
+    path = args.save_path + "/" + args.checkpoint_folder_name
+    os.makedirs(path)
+
+
+    # args.save_path = args.source_path + '/' + args.experiment_name + '/'
+    # if not os.path.exists(args.save_path):
+    #     os.makedirs(args.save_path)
+    # return args
 
 
 # def cfg_from_file(filename,subfolder):
