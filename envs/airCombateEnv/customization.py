@@ -1,18 +1,27 @@
 import numpy as np
-#from argument.dqnArgs import args
+
 from argument.argManage import args
+
 np.random.seed(args.env_random_seed)
 
 
-def random_pos(init_scen, red, blue, random_r, random_b):
+# ===========================================
+#                posture setting
+#        including position and angle
+# ===========================================
+def init_posture(init_scen, red, blue, random_r, random_b):
     """
-    根据初始想定模式和是否随机对飞机位置进行初始化
-    :param init_scen:初始想定模式
-    :param red:
-    :param blue:
-    :param random_r:红方是否随机
-    :param random_b:蓝方是否随机
-    :return:red, blue
+    param:
+        init_scen:      场景类型
+        red:            红方
+        blue:           蓝方
+        random_r:       红方是否随机；1：随机；0：固定
+        random_b:       蓝方是否随机；1：随机；0：固定
+    return:
+        红方、蓝方
+    主要逻辑：
+        最外围逻辑判断根据场景类型进行区分
+        --内层逻辑根据红蓝方是否随机区分
     """
     if init_scen == 0:  # 随机
         if random_r == 1:
@@ -110,11 +119,11 @@ def random_pos(init_scen, red, blue, random_r, random_b):
 
         if random_b == 1:
             blue.ac_pos = np.append(np.random.uniform(-50, 50),
-                                   np.random.uniform(-250, 250))
+                                    np.random.uniform(-250, 250))
             blue.ac_heading = 0
         elif random_b == 0:
             blue.ac_pos = np.array([0.0, -100.0])
-            blue.ac_heading == 0
+            blue.ac_heading = 0
         else:
             raise Exception("random_b error")
     else:

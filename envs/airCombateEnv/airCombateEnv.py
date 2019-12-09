@@ -7,9 +7,8 @@ import time
 import sys
 
 sys.path.append('../..')
-from envs.airCombateEnv.customization import random_pos
+from envs.airCombateEnv.customization import init_posture
 from envs.airCombateEnv.customization import REGISTRY_STATE as registry_state
-#from argument.dqnArgs import args
 from argument.argManage import args
 from envs.unit import REGISTRY as registry_unit
 
@@ -145,7 +144,9 @@ class AirCombatEnv(Env):
         self.ATA_r = self.AA_r = 100
         self.adv_count = 0
         # 初始化红蓝方飞机
-        random_pos(self.init_scen, self.red, self.blue, args.random_r, args.random_b)
+        init_posture(self.init_scen, self.red, self.blue, args.random_r, args.random_b)
+        self.red.oil = args.Sum_Oil
+        self.blue.oil = args.Sum_Oil
         # print(self.red.ac_pos)
         # print(self.blue.ac_pos)
         # 计算ATA，AA
@@ -429,7 +430,7 @@ class AirCombatEnvMultiUnit(Env):
             unit.move(action)
 
 
-#环境测试程序
+# 环境测试程序
 if __name__ == '__main__':
     env = AirCombatEnv()
     env.init_scen = 3
@@ -442,8 +443,8 @@ if __name__ == '__main__':
         if env.done:
             s = env.reset_selfPlay()
             env.creat_ALG()
-        #a = np.random.randint(0,3)
+        # a = np.random.randint(0,3)
         a_b = 1
         a_r = 1
-        env.step_selfPlay(a_b,a_r)
+        env.step_selfPlay(a_b, a_r)
         env.render()
