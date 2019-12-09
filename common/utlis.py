@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 import math
 import torch
-import torch.autograd as autograd 
+import torch.autograd as autograd
+
 
 def set_seed(seed):
     import numpy as np
@@ -64,4 +65,4 @@ def judge_type(arg):
         return 'list'
     else:
         raise Exception("Invalid type!", arg)
-    
+
