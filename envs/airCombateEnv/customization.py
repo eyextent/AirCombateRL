@@ -1,8 +1,7 @@
 import numpy as np
 
 from argument.argManage import args
-
-np.random.seed(args.env_random_seed)
+from common.utlis import random_two_range
 
 
 # ===========================================
@@ -58,7 +57,7 @@ def init_posture(init_scen, red, blue, random_r, random_b):
             blue.ac_pos = np.append(np.random.uniform(-100, -500),
                                     np.random.uniform(-50, 50))
             # 330~360 0~30
-            blue.ac_heading = np.random.uniform(0, 30)
+            blue.ac_heading = random_two_range(0, 30, 330, 360)
         elif random_b == 0:
             blue.ac_pos = np.array([-100.0, 0.0])  # 二维坐标
             blue.ac_heading = 180  # 朝向角,向东
@@ -69,7 +68,7 @@ def init_posture(init_scen, red, blue, random_r, random_b):
             red.ac_pos = np.append(np.random.uniform(100, 500),
                                    np.random.uniform(-50, 50))
             # 330~360 0~30
-            red.ac_heading = np.random.uniform(0, 30)
+            red.ac_heading = random_two_range(0, 30, 330, 360)
         elif random_r == 0:
             red.ac_pos = np.array([100.0, 0.0])  # 二维坐标
             red.ac_heading = 180
@@ -100,7 +99,7 @@ def init_posture(init_scen, red, blue, random_r, random_b):
             blue.ac_pos = np.append(np.random.uniform(-100, -500),
                                     np.random.uniform(-50, 50))
             # 330~360, 0~30
-            blue.ac_heading = np.random.uniform(0, 30)
+            blue.ac_heading = random_two_range(0, 30, 330, 360)
         elif random_b == 0:
             blue.ac_pos = np.array([-100.0, 0.0])  # 二维坐标
             blue.ac_heading = 0

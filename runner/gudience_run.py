@@ -1,13 +1,12 @@
-import torch
 import sys
-
-from interactor.episodeTrainer import run_GuidenceEnv
-
-sys.path.append('..')
 import envs
 from models.dqn import DQN2013
 from argument.argManage import args
 from common.utlis import set_seed
+from interactor.episodeTrainer import run_GuidenceEnv
+
+sys.path.append('..')
+
 
 
 def run():
