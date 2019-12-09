@@ -1,7 +1,7 @@
 import torch
 import sys
 
-from interactor.episodeTrainer import run
+from interactor.episodeTrainer import run_GuidenceEnv
 
 sys.path.append('..')
 import envs
@@ -13,7 +13,7 @@ from common.utlis import set_seed
 def run():
     env = envs.make(args.env_name)
     train_agent = DQN2013(env.state_dim, env.action_dim, is_train=True, is_based=False, scope="guidence")
-    run(env, train_agent)
+    run_GuidenceEnv(env, train_agent)
 
 
 if __name__ == '__main__':
