@@ -34,7 +34,6 @@ def epsilon_scheduler(eps_start, eps_final, eps_decay):
     return function
 
 
-
 # ===========================================
 #                   math
 # ===========================================
@@ -63,5 +62,5 @@ def judge_type(arg):
     elif isinstance(arg, list):
         return 'list'
     else:
-        raise Exception("Invalid type!", arg)
+        raise Exception("Invalid type! %s"%str(type(arg)), arg)
     

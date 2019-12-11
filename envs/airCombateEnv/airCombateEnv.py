@@ -432,7 +432,7 @@ class AirCombatEnvMultiUnit(Env):
 #环境测试程序
 if __name__ == '__main__':
     env = AirCombatEnv()
-    env.init_scen = 3
+    env.init_scen = 4
     args.random_r = 1
     args.random_b = 1
     s = env.reset_selfPlay()
