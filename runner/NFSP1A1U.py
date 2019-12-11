@@ -14,6 +14,12 @@ from common.config import args_wrapper_checkpoint_folder
 
 ex = Experiment('NFSP1A1U')
 
+def run():
+    print(args)
+    env = envs.make(args.env_name)
+    blue_agent = DQN(env.state_dim, env.action_dim, is_train=1, scope='blue')
+    red_agent  = DQN(env.state_dim, env.action_dim, is_train=1, scope='red')
+    run_NFSP(env, blue_agent, red_agent)
 
 
 @ex.main
@@ -21,19 +27,8 @@ def my_main():
     # print(config.save_path)
     args.seed = 555
     set_seed(args.seed)
-    args_wrapper_checkpoint_folder(args)
+    
     run()
-
-def run():
-
-    print(args)
-    env = envs.make(args.env_name)
-
-
-    blue_agent = DQN(env.state_dim, env.action_dim, is_train=1, scope='blue')
-    red_agent  = DQN(env.state_dim, env.action_dim, is_train=1, scope='red')
-    run_NFSP(env, blue_agent, red_agent)
-
 
 if __name__ == "__main__":
     '''
@@ -42,6 +37,7 @@ if __name__ == "__main__":
     高阶逻辑；
     等...
     '''
+    
     ex.observers.append(FileStorageObserver.create(args.save_path))
     ex.add_config({"config": args})
     ex.run_commandline()
