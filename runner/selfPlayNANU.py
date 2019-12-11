@@ -4,7 +4,7 @@
 import sys
 sys.path.append('..')
 import envs
-from models.dqn import DQN2013 as DQN
+from models.dqn import DQN
 #from argument.dqnArgs import args
 import common.alloc as alloc
 from trainer.episodeSelfPlayTrainer import run_AirCombat_selfPlay

@@ -24,7 +24,7 @@ if 'cnn' in args.net_frame:
     print("\nWarning: must def convs!")
 
 
-class DQN(object):
+class DQNBase(object):
     def __init__(self, state_dim, n_action):
         self.replay_buffer = ReplayBuffer(args.replay_size)
         self.epsilon = args.initial_epsilon
@@ -53,7 +53,7 @@ class DQN(object):
         raise NotImplementedError
 
 
-class DQN2013(DQN):
+class DQN(DQNBase):
     def __init__(self, state_dim, n_action, is_train=False, is_based=False, scope=None):
         super(DQN2013, self).__init__(state_dim, n_action)
         self.scope = scope
@@ -131,7 +131,7 @@ class DQN2013(DQN):
     def update_target_net(self):
         assert self.flag_target_net
         self.target_model.load_state_dict(self.model.state_dict())
-        print("update target network")
+        print("updating target network...")
 
     def perceive(self, state, action, reward, next_state, done):
         self.replay_buffer.store(state, action, reward,
@@ -183,7 +183,7 @@ class DQN2013(DQN):
             torch.save(self.model.state_dict(), self.save_path + "/" + self.checkpoint_folder_name+"/" + str(iter_num) + self.scope + self.file_name)
 
 
-class DQN4NFSP(DQN):
+class DQN4NFSP(DQNBase):
     def __init__(self, state_dim, action_dim, scope, is_train=1, is_based=0):
         super(DQN4NFSP, self).__init__(state_dim, action_dim)
         self.buffer_rl = self.replay_buffer                         # 强化学习使用的buffer，简单的对rl_buffer对象进行重命名
@@ -313,7 +313,7 @@ class DQN4NFSP(DQN):
     def NFSP_action(self, state, epsilon_decay=1, eta_decay=0):
         '''
         Param:
-            self.eta:  probability for best_response or average_stargery
+            self.eta*:  probability for best_response or average_stargery
         '''
         if epsilon_decay:
             if self.epsilon > 0.1:
