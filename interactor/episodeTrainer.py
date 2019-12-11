@@ -4,10 +4,11 @@
 '''
 主函数逻辑：单进程
 '''
-#from argument.dqnArgs import args
+# from argument.dqnArgs import args
 from argument.argManage import args
 
-def run(env, train_agent):
+
+def run_GuidenceEnv(env, train_agent):
     # ====  loop start ====
     if train_agent.is_train:
         suc_num = 0
