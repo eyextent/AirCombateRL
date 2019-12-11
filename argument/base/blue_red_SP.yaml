@@ -1,0 +1,14 @@
+source_path: ../result #保存路径
+experiment_name: blue_red_game  #保存文件夹的名字
+checkpoint_folder_name: _saved_networks/  #参数保存文件夹的名字，加/结尾
+file_name: _agent.pkl #参数保存文件名+pkl
+
+# utlis
+seed: 125
+
+# interactor
+episode: 2000000  #训练的最大episode数)
+store: 10000  #初始化经验池时运行的episode数)
+test_episode: 100  #测试时运行的episode数)
+train_episode: 100  #每训练多少个episode后启动测试)
+observe_step: 100000  #观察的步数，即在此阶段只是储存样本，不进行训练)

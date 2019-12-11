@@ -7,10 +7,22 @@ import sys
 sys.path.append('..')
 import envs
 from models.dqn import DQN2013 as DQN
-from argument.dqnArgs import args
+#from argument.dqnArgs import args
 import common.alloc as alloc
 from common.utlis import set_seed
 from interactor.episodeSelfPlay import run_AirCombat_selfPlay
+from argument.argManage import args
+from sacred import Experiment
+from sacred.observers import FileStorageObserver
+from common.config import args_wrapper_checkpoint_folder
+
+ex = Experiment('selfPlay1A1U')
+
+@ex.main
+def my_main():
+    set_seed(args.seed)
+    args_wrapper_checkpoint_folder(args)
+    run()
 
 
 def run():
@@ -40,7 +52,7 @@ if __name__ == "__main__":
     高阶逻辑；
     等...
     '''
+    ex.observers.append(FileStorageObserver.create(args.save_path))
+    ex.add_config({"config": args})
     set_seed(args.seed)
-    args.Sum_Oil = 100
-    args.flag_is_train = 0
-    run()
+    # run()

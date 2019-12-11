@@ -5,9 +5,16 @@ import sys
 sys.path.append('..')
 import envs
 from models.dqn import DQN2013 as DQN
-from argument.dqnArgs import args
+#from argument.dqnArgs import args
 import common.alloc as alloc
 from trainer.episodeSelfPlayTrainer import run_AirCombat_selfPlay
+from argument.argManage import args
+from sacred import Experiment
+from sacred.observers import FileStorageObserver
+from common.config import args_wrapper_checkpoint_folder
+
+ex = Experiment('selfPlay1A1U')
+
 
 # 使用的参数：
 args.n_blue
@@ -24,6 +31,12 @@ blue_agent_list = []
 red_agent_list = []
 for unit in env.blue_unit_list:
     pass
+
+@ex.main
+def my_main():
+    set_seed(args.seed)
+    args_wrapper_checkpoint_folder(args)
+    run()
 
 def creat_n_agent(unit_list, is_train, scope, sess):
     agent_list = []
@@ -46,3 +59,5 @@ def main():
     raise NotImplementedError
 
 
+ex.observers.append(FileStorageObserver.create(args.save_path))
+ex.add_config({"config": args})
