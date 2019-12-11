@@ -71,6 +71,7 @@ class DQN2013(DQN):
         self.checkpoint_folder_name = args.checkpoint_folder_name
         self.file_name = args.file_name
 
+
         self.flag_target_net = args.flag_target_net     # 是否使用 target_network （2013 or 2015）
 
         self.model = registry_net_frame[args.net_frame](self.state_dim, self.n_action)
@@ -91,12 +92,12 @@ class DQN2013(DQN):
         if self.is_train:
             if self.is_based:
                 self.epsilon = INITIAL_EPSILON * 0.5
-                self.model.load_state_dict(torch.load(self.save_path + self.scope + self.file_name))
+                self.model.load_state_dict(torch.load(self.save_path + "/" + self.checkpoint_folder_name+"/" +self.scope + self.file_name))
                 #     print("Successfully loaded:", checkpoint.model_checkpoint_path)
                 # else:
                 #     print("Could not find old network weights")
         else:
-            file_path = self.save_path + self.scope + self.file_name
+            file_path = self.save_path + "/" + self.checkpoint_folder_name+"/" + self.scope + self.file_name
             if os.path.exists(file_path):
                 self.model.load_state_dict(torch.load(file_path))
                 print("\n\n\n=======Successfully loaded:" + file_path + "========")
@@ -182,9 +183,9 @@ class DQN2013(DQN):
         if not os.path.exists(self.save_path):
             os.makedirs(self.save_path)
         if iter_num is None:
-            torch.save(self.model.state_dict(), self.save_path + self.scope + self.file_name)
+            torch.save(self.model.state_dict(), self.save_path + "/" + self.checkpoint_folder_name+"/" + self.scope + self.file_name)
         else:
-            torch.save(self.model.state_dict(), self.save_path + str(iter_num) + self.scope + self.file_name)
+            torch.save(self.model.state_dict(), self.save_path + "/" + self.checkpoint_folder_name+"/" + str(iter_num) + self.scope + self.file_name)
 
 
 class DQN4NFSP(DQN):
