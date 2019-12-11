@@ -12,6 +12,7 @@ from argument.argManage import args
 from sacred import Experiment
 from sacred.observers import FileStorageObserver
 from common.config import args_wrapper_checkpoint_folder
+from common.config import add_ex_config_obs
 
 ex = Experiment('selfPlay1A1U')
 
@@ -35,7 +36,7 @@ for unit in env.blue_unit_list:
 @ex.main
 def my_main():
     set_seed(args.seed)
-    args_wrapper_checkpoint_folder(args)
+    args_wrapper_checkpoint_folder(args, ex.current_run._id)
     run()
 
 def creat_n_agent(unit_list, is_train, scope, sess):
@@ -59,5 +60,4 @@ def main():
     raise NotImplementedError
 
 
-ex.observers.append(FileStorageObserver.create(args.save_path))
-ex.add_config({"config": args})
+add_ex_config_obs(ex, args, result_path=None)

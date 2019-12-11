@@ -6,6 +6,8 @@ import argparse
 import datetime
 from common.utlis import judge_type
 import pprint
+from sacred.observers import FileStorageObserver
+
 
 base_dir = os.path.dirname(os.path.dirname(__file__))
 #print(base_dir)
@@ -48,9 +50,11 @@ def args_wrapper_path(args, last_path):
     '''
     主要是对重复训练的保存路径进行封装
     '''
-    data_path_suffix_date = datetime.datetime.now().strftime('_%Y-%m-%d')
+    # data_path_suffix_date = datetime.datetime.now().strftime('_%Y-%m-%d')
+
     if last_path is None:
-        args.save_path = args.source_path + '/' + args.experiment_name + data_path_suffix_date + '/'
+        # args.save_path = args.source_path + '/' + args.experiment_name + data_path_suffix_date + '/'
+        args.save_path = args.source_path + '/' + args.experiment_name
         # 判断日期文件夹是否建立
         if not os.path.exists(args.save_path):
             os.makedirs(args.save_path)
@@ -62,15 +66,32 @@ def args_wrapper_path(args, last_path):
     return args
 
 # 在当次实验的记录文件下创建配置文件中checkpoint_folder的文件夹
-def args_wrapper_checkpoint_folder(args):
+def args_wrapper_checkpoint_folder(args, file_number):
+
+    # 创建一个txt文本 记录此次存放结果的路径
+    txt_path = args.save_path + "/\.result_path.txt"
+    file = open(txt_path, 'w')
+
     file_list = os.listdir(args.save_path)
     # 根据文件夹的时间降序排列
-    file_list.sort(key=lambda fn: os.path.getmtime(args.save_path + "/" + fn), reverse=True)
-    args.save_path = args.save_path + "/" + file_list[0]
+    # file_list.sort(key=lambda fn: os.path.getmtime(args.save_path + "/" + fn), reverse=True)
+    args.save_path = args.save_path + "/" +str(file_number)
     path = args.save_path + "/" + args.checkpoint_folder_name
-    print("=======")
-    print(path)
     os.makedirs(path)
+    file.write(args.save_path)
+
+def add_ex_config_obs(ex, args, result_path):
+    args.flag_is_train = 0
+    if args.flag_is_train:  # 如果是训练则创建观察者（存放结果的文件）
+        ex.observers.append(FileStorageObserver.create(args.save_path))
+        ex.add_config({"config": args})
+    else:
+        if result_path is None:
+            file = open(args.save_path + "\.result_path.txt", "r")
+            path = file.read()
+            args.save_path = path
+        else:
+            args.save_path = args.save_path + "/" + str(result_path)
 
 
     # args.save_path = args.source_path + '/' + args.experiment_name + '/'
