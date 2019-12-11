@@ -41,7 +41,6 @@ def run_AirCombat_selfPlay(env, train_agent, use_agent, train_agent_name):
 
         #经验池存储数据
         env.init_scen = 0
-        train_agent.save_model()
         for episode in range(args.store):
             #reset
             state_train_agent, state_use_agent = alloc.env_reset(env, train_agent_name)
