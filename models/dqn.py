@@ -75,13 +75,11 @@ class DQN2013(DQN):
         self.flag_target_net = args.flag_target_net     # 是否使用 target_network （2013 or 2015）
 
         self.model = registry_net_frame[args.net_frame](self.state_dim, self.n_action)
-        if self.flag_target_net:
-            self.target_model = registry_net_frame[args.net_frame](self.state_dim, self.n_action)
+        self.target_model = registry_net_frame[args.net_frame](self.state_dim, self.n_action) if self.flag_target_net else None
 
         if U.is_cuda():
             self.model = self.model.cuda()
-            if self.flag_target_net:
-                self.target_model = self.target_model.cuda() 
+            self.target_model = self.target_model.cuda() if self.flag_target_net else None
         
         self.optimizer = optim.Adam(self.model.parameters(), lr=self.learning_rate)
         self._load_parms()
@@ -119,16 +117,13 @@ class DQN2013(DQN):
         done       = U.Variable(torch.FloatTensor(done))
 
         q_values      = self.model(state)
-        if self.flag_target_net:
-            next_q_values = self.target_model(next_state)
-        else:
-            next_q_values = self.model(next_state)
+        next_q_values = self.target_model(next_state) if self.flag_target_net else self.model(next_state)
 
         q_value          = q_values.gather(1, action.unsqueeze(1)).squeeze(1)
         next_q_value_max = next_q_values.max(1)[0]
-        expected_q_value = reward + self.gamma * next_q_value_max * (1 - done)
+        bellman_target = reward + self.gamma * next_q_value_max * (1 - done)
         
-        loss = (q_value - U.Variable(expected_q_value.detach())).pow(2).mean()            
+        loss = (q_value - U.Variable(bellman_target.detach())).pow(2).mean()            
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
