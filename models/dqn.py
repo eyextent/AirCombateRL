@@ -24,7 +24,7 @@ if 'cnn' in args.net_frame:
     print("\nWarning: must def convs!")
 
 
-class DQN(object):
+class DQNBase(object):
     def __init__(self, state_dim, n_action):
         self.replay_buffer = ReplayBuffer(args.replay_size)
         self.epsilon = args.initial_epsilon
@@ -53,7 +53,7 @@ class DQN(object):
         raise NotImplementedError
 
 
-class DQN2013(DQN):
+class DQN(DQNBase):
     def __init__(self, state_dim, n_action, is_train=False, is_based=False, scope=None):
         super(DQN2013, self).__init__(state_dim, n_action)
         self.scope = scope
@@ -75,13 +75,11 @@ class DQN2013(DQN):
         self.flag_target_net = args.flag_target_net     # 是否使用 target_network （2013 or 2015）
 
         self.model = registry_net_frame[args.net_frame](self.state_dim, self.n_action)
-        if self.flag_target_net:
-            self.target_model = registry_net_frame[args.net_frame](self.state_dim, self.n_action)
+        self.target_model = registry_net_frame[args.net_frame](self.state_dim, self.n_action) if self.flag_target_net else None
 
         if U.is_cuda():
             self.model = self.model.cuda()
-            if self.flag_target_net:
-                self.target_model = self.target_model.cuda() 
+            self.target_model = self.target_model.cuda() if self.flag_target_net else None
         
         self.optimizer = optim.Adam(self.model.parameters(), lr=self.learning_rate)
         self._load_parms()
@@ -119,16 +117,13 @@ class DQN2013(DQN):
         done       = U.Variable(torch.FloatTensor(done))
 
         q_values      = self.model(state)
-        if self.flag_target_net:
-            next_q_values = self.target_model(next_state)
-        else:
-            next_q_values = self.model(next_state)
+        next_q_values = self.target_model(next_state) if self.flag_target_net else self.model(next_state)
 
         q_value          = q_values.gather(1, action.unsqueeze(1)).squeeze(1)
         next_q_value_max = next_q_values.max(1)[0]
-        expected_q_value = reward + self.gamma * next_q_value_max * (1 - done)
+        bellman_target = reward + self.gamma * next_q_value_max * (1 - done)
         
-        loss = (q_value - U.Variable(expected_q_value.detach())).pow(2).mean()            
+        loss = (q_value - U.Variable(bellman_target.detach())).pow(2).mean()            
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
@@ -136,7 +131,7 @@ class DQN2013(DQN):
     def update_target_net(self):
         assert self.flag_target_net
         self.target_model.load_state_dict(self.model.state_dict())
-        print("update target network")
+        print("updating target network...")
 
     def perceive(self, state, action, reward, next_state, done):
         self.replay_buffer.store(state, action, reward,
@@ -188,7 +183,7 @@ class DQN2013(DQN):
             torch.save(self.model.state_dict(), self.save_path + "/" + self.checkpoint_folder_name+"/" + str(iter_num) + self.scope + self.file_name)
 
 
-class DQN4NFSP(DQN):
+class DQN4NFSP(DQNBase):
     def __init__(self, state_dim, action_dim, scope, is_train=1, is_based=0):
         super(DQN4NFSP, self).__init__(state_dim, action_dim)
         self.buffer_rl = self.replay_buffer                         # 强化学习使用的buffer，简单的对rl_buffer对象进行重命名
@@ -318,7 +313,7 @@ class DQN4NFSP(DQN):
     def NFSP_action(self, state, epsilon_decay=1, eta_decay=0):
         '''
         Param:
-            self.eta:  probability for best_response or average_stargery
+            self.eta*:  probability for best_response or average_stargery
         '''
         if epsilon_decay:
             if self.epsilon > 0.1:

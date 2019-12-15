@@ -50,10 +50,8 @@ def args_wrapper_path(args, last_path):
     '''
     主要是对重复训练的保存路径进行封装
     '''
-
-    # 主要是对重复训练的保存路径进行封装
-    # None
     # data_path_suffix_date = datetime.datetime.now().strftime('_%Y-%m-%d')
+
     if last_path is None:
         # args.save_path = args.source_path + '/' + args.experiment_name + data_path_suffix_date + '/'
         args.save_path = args.source_path + '/' + args.experiment_name

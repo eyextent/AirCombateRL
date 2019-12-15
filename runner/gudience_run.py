@@ -1,6 +1,6 @@
 import sys
 import envs
-from models.dqn import DQN2013
+from models.dqn import DQN
 from argument.argManage import args
 from common.utlis import set_seed
 from interactor.episodeTrainer import run_GuidenceEnv
