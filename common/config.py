@@ -83,13 +83,12 @@ def args_wrapper_checkpoint_folder(args, file_number):
     file.write(args.save_path)
 
 def add_ex_config_obs(ex, args, result_path):
-    args.flag_is_train = 0
     if args.flag_is_train:  # 如果是训练则创建观察者（存放结果的文件）
         ex.observers.append(FileStorageObserver.create(args.save_path))
         ex.add_config({"config": args})
     else:
         if result_path is None:
-            file = open(args.save_path + "\.result_path.txt", "r")
+            file = open(args.save_path + "\.result_path.txt", "w+")
             path = file.read()
             args.save_path = path
         else:

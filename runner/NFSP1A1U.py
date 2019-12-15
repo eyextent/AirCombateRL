@@ -11,6 +11,8 @@ from sacred import Experiment
 from sacred.observers import FileStorageObserver
 from common.config import args_wrapper_checkpoint_folder
 from common.config import add_ex_config_obs
+from common.config import args_wrapper_path
+
 
 
 
@@ -41,6 +43,10 @@ if __name__ == "__main__":
     高阶逻辑；
     等...
     '''
+    # 这里可以设置实验的名称
+    args.experiment_name = "my_experiment"
+    args_wrapper_path(args, None)
+    args.flag_is_train = 1
     # 添加观察者和配置文件
     add_ex_config_obs(ex, args, result_path=1)
     ex.run_commandline()

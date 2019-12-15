@@ -15,6 +15,7 @@ from sacred import Experiment
 from sacred.observers import FileStorageObserver
 from common.config import args_wrapper_checkpoint_folder
 from common.config import add_ex_config_obs
+from common.config import args_wrapper_path
 
 ex = Experiment('selfPlay1A1U')
 
@@ -54,6 +55,9 @@ if __name__ == "__main__":
     等...
     '''
     # 添加观察者和配置文件
+    args.experiment_name = "my_experiment"
+    args_wrapper_path(args, None)
+    args.flag_is_train = 1
     add_ex_config_obs(ex, args, result_path=None)
     set_seed(args.seed)
     ex.run_commandline()
